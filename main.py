@@ -1,68 +1,94 @@
+from typing import TypedDict
+
 import httpx
 from decouple import config
 
 TMDB_URL = "https://api.themoviedb.org/3"
-ANILIST_URL = "https://graphql.anilist.co"
+ANILIST_API_URL = "https://graphql.anilist.co"
 
 TMDB_TOKEN = config("TMDB_TOKEN")
 
 HEADERS = {"Authorization": f"Bearer {TMDB_TOKEN}"}
 
-TRENDING_QUERY = """
+FETCH_TRENDING_MEDIA_QUERY = """
 query ($type: MediaType, $page: Int) {
   Page(page: $page, perPage: 5) {
     media(type: $type, sort: TRENDING_DESC) {
-      id idMal type
-      title { romaji english native }
-      genres description coverImage { large }
-      popularity averageScore countryOfOrigin status
-      episodes chapters
+      id
+      title { english }
+      genres coverImage { large }
+      averageScore countryOfOrigin 
+      status episodes
     }
   }
 }
 """
 
-VARIABLES = f"{ {'type': 'ANIME', 'page': 1} }"
+
+class Movie(TypedDict):
+    adult: bool
+    backdrop_path: str
+    id: int
+    title: str
+    overview: str
+    poster_path: str
+    media_type: str
+    original_language: str
+    genre_ids: list
+    popularity: int
+    release_date: str
+    video: bool
+    vote_average: int
+    vote_count: int
 
 
-def _fetch_tmdb_data(endpoint: str) -> dict | None:
-    """
-    Retrieve information from a TMDB API endpoint
-    """
-    client = httpx.Client(base_url=TMDB_URL, headers=HEADERS)
-    try:
-        response = client.get(endpoint)
-        response.raise_for_status()
-        return response.json()
-    except httpx.HTTPStatusError as e:
-        print(f"Failed to fetch data for {endpoint}: {e.response.status_code}")
-        return None
-    except httpx.RequestError as e:
-        print(f"Network error: {e}")
-        return None
+class Media(TypedDict):
+    id: int
+    title: dict
+    genres: list
+    averageScore: int
+    countryOfOrigin: str
+    status: str
+    episodes: int
 
 
-def _fetch_anilist_data(query: str, variables: str) -> dict | None:
+def _fetch_tmdb_data(endpoint: str) -> list[Movie] | None:
     """
-    Retrieve information from a AniList API endpoint
+    Retrieve movie information from a TMDB API endpoint
     """
-    client = httpx.Client(base_url=ANILIST_URL)
-    try:
-        response = client.post("", json={"query": query, "variables": variables})
-        response.raise_for_status()
-        return response.json()
-    except httpx.HTTPStatusError as e:
-        print(f"Failed to fetch data for {query}: {e.response.status_code}")
-        return None
-    except httpx.RequestError as e:
-        print(f"Network error: {e}")
-        return None
+    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
+        try:
+            response = client.get(endpoint)
+            response.raise_for_status()
+            return response.json().get("results", [])
+        except (httpx.HTTPStatusError, httpx.RequestError) as e:
+            print(f"Failed to fetch data for {endpoint}: {e}")
+            return None
+
+
+def _fetch_anilist_media(query: str, variables: str) -> list[Media] | None:
+    """
+    Retrieve anime and manga information from a AniList API endpoint
+    """
+    with httpx.Client(base_url=ANILIST_API_URL) as client:
+        try:
+            response = client.post("", json={"query": query, "variables": variables})
+            response.raise_for_status()
+            response_data = (
+                response.json().get("data", {}).get("Page", {}).get("media", [])
+            )
+            return response_data
+        except (httpx.HTTPStatusError, httpx.RequestError) as e:
+            print(f"Failed to fetch data for {query}: {e}")
+            return None
 
 
 def main():
+    trending_anime_vars = f"{ {'type': 'ANIME', 'page': 1} }"
     data = _fetch_tmdb_data("/trending/movie/week")
-    anime = _fetch_anilist_data(TRENDING_QUERY, VARIABLES)
+    anime = _fetch_anilist_media(FETCH_TRENDING_MEDIA_QUERY, trending_anime_vars)
     print(data)
+    print("\n\n\n")
     print(anime)
 
 
