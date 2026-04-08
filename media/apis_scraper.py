@@ -1,12 +1,12 @@
 from typing import TypedDict
 
 import httpx
-from decouple import config
+from django.conf import settings
+
+TMDB_TOKEN = settings.TMDB_TOKEN
 
 TMDB_URL = "https://api.themoviedb.org/3"
 ANILIST_API_URL = "https://graphql.anilist.co"
-
-TMDB_TOKEN = config("TMDB_TOKEN")
 
 HEADERS = {"Authorization": f"Bearer {TMDB_TOKEN}"}
 
@@ -28,7 +28,7 @@ query ($type: MediaType, $page: Int) {
 class Movie(TypedDict):
     adult: bool
     backdrop_path: str
-    id: int
+    movie_id: int
     title: str
     overview: str
     poster_path: str
@@ -43,7 +43,7 @@ class Movie(TypedDict):
 
 
 class Media(TypedDict):
-    id: int
+    media_id: int
     title: dict
     genres: list
     averageScore: int
