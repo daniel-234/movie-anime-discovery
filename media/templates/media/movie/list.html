@@ -2,11 +2,16 @@
 {% block title %}Movies{% endblock %}
 {% block content %}
   <h1>Movies</h1>
-  {% for movie in movies %}
-    <h6>
-      <a href="{% url 'media:movie_detail' movie.id %}"></a>
-        {{ movie.title }}
-    </a>
-    </h6>
-  {% endfor %}
+
+  <table>
+    {% for movie in movies %}
+      <tr>
+        <td>
+          <a href="{% url 'media:movie_detail' movie.id %}">
+            {{ movie.title }}
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>        
 {% endblock %}
