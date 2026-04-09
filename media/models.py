@@ -19,7 +19,7 @@ class Movie(models.Model):
     original_language = models.CharField(max_length=3)
     genre_ids = models.ManyToManyField(MovieGenre)
     popularity = models.IntegerField(default=0, null=True, blank=True)
-    release_date = models.CharField(max_length=250)
+    release_date = models.DateField(null=True, blank=True)
     vote_average = models.FloatField(default=0, null=True, blank=True)
     vote_count = models.IntegerField(default=0, null=True, blank=True)
     adult = models.BooleanField(default=False)
