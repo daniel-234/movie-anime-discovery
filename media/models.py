@@ -16,3 +16,7 @@ class Movie(models.Model):
     vote_average = models.FloatField(default=0, null=True, blank=True)
     vote_count = models.IntegerField(default=0, null=True, blank=True)
     adult = models.BooleanField(default=False)
+    # Explicitly declare the manager on the model as it is added
+    # dynamically by Django's metaclass and static analysis tools
+    # like the "ty" typechecker can't see it, flagging it as missing.
+    objects: models.Manager

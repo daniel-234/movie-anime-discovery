@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404, render
 
 from .models import Movie
-from .tmdb import get_movie_list_from_api
+from .tasks import get_movies, sync_trending_movies
 
 
 def movie_list(request):
-    movies = get_movie_list_from_api("/trending/movie/week")
+    sync_trending_movies()
+    movies = get_movies()
     return render(request, "media/movie/list.html", {"movies": movies})
 
 
