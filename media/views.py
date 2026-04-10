@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404, render
 
 from .models import Movie
-from .tasks import get_movies, sync_trending_movies
+
+# from .tasks import get_movies, sync_trending_movies
 
 
 def movie_list(request):
-    sync_trending_movies()
-    movies = get_movies()
+    # sync_trending_movies()
+    movies = Movie.objects.all()[:5]
     return render(request, "media/movie/list.html", {"movies": movies})
 
 

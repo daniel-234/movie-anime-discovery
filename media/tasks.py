@@ -15,7 +15,3 @@ def sync_trending_movies() -> None:
                 movie_id=movie["id"],
                 defaults={"title": movie["title"], "release_date": release_date},
             )
-
-
-def get_movies():
-    return Movie.objects.all()[:5]
