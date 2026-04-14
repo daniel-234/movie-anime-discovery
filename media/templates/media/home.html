@@ -1,0 +1,26 @@
+{% extends "media/base.html" %}
+{% block title %}Movies{% endblock %}
+{% block content %}
+  <h2>Trending</h2>
+    <h4>Movies</h4>
+  <ul>
+    {% for movie in movie_list %}
+      <li>
+        <a href="{% url 'media:movie_detail' movie.id %}">
+            {{ movie.title }}
+        </a>
+      </li>
+    {% endfor %}
+    </ul>  
+
+  <h4>Anime</h4>
+  <ul>
+    {% for anime in anime_list %}
+      <li>
+        <a href="{% url 'media:anime_detail' anime.id %}">
+            {{ anime.title }}
+        </a>
+      </li>
+    {% endfor %}
+    </ul>        
+{% endblock %}
