@@ -52,5 +52,6 @@ class Command(BaseCommand):
                     defaults={
                         "title": anime["title"]["english"],
                         "country_of_origin": anime["countryOfOrigin"],
+                        "cover_image": anime["cover_image"]["large"],
                     },
                 )

@@ -32,6 +32,7 @@ class Media(TypedDict):
     id: int
     title: dict
     genres: list
+    cover_image: dict
     averageScore: int
     countryOfOrigin: str
     status: str

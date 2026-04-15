@@ -6,7 +6,7 @@ class MovieGenre(models.Model):
     genre_id = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.genre_id}: {self.name}"
+        return f"{self.genre_id}: {self.name} Movie Genre"
 
 
 class AnimeGenre(models.Model):
@@ -33,13 +33,14 @@ class Movie(models.Model):
     adult = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.title}: image at {self.poster_path}"
+        return self.title
 
 
 class Anime(models.Model):
     media_id = models.IntegerField(default=0, unique=True)
     title = models.CharField(max_length=100)
     genres = models.ManyToManyField(AnimeGenre)
+    cover_image = models.URLField(blank=True, null=True)
     averageScore = models.IntegerField(default=0, null=True, blank=True)
     # TODO Check if there's any specification in the API docs about this value length
     country_of_origin = models.CharField(max_length=3)

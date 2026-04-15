@@ -2,7 +2,7 @@
 {% block title %}Movies{% endblock %}
 {% block content %}
   <h2>Trending</h2>
-    <h4>Movies</h4>
+  <h4>Movies</h4>
   <div class="grid grid-cols-5 gap-4">
     {% for movie in movie_list %}
       <div>
@@ -16,13 +16,13 @@
   </div>
 
   <h4>Anime</h4>
-  <ul>
+  <div class="grid grid-cols-5 gap-4">
     {% for anime in anime_list %}
-      <li>
+      <div>
         <a href="{% url 'media:anime_detail' anime.id %}">
-            {{ anime.title }}
+          <img class="w-full object-cover rounded-lg" src="{{ anime.cover_image }}" alt="{{ anime.title }}">
         </a>
-      </li>
-    {% endfor %}
-    </ul>        
+        <p class="mt-2 text-sm">{{ anime.title }}</p>
+      </div>
+    {% endfor %}    
 {% endblock %}
