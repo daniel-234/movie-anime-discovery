@@ -1,9 +1,9 @@
-{% load static %}
+{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html>
 <head>
   <title>{% block title %}{% endblock %}</title>
-  <link href=”{% static "css/blog.css" %}” rel=”stylesheet”>
+  {% tailwind_css %}
 </head>
 <body>
   <div id=”content”>
