@@ -3,15 +3,17 @@
 {% block content %}
   <h2>Trending</h2>
     <h4>Movies</h4>
-  <ul>
+  <div class="grid grid-cols-5 gap-4">
     {% for movie in movie_list %}
-      <li>
+      <div>
         <a href="{% url 'media:movie_detail' movie.id %}">
-            {{ movie.title }}
-        </a>
-      </li>
-    {% endfor %}
-    </ul>  
+          <img class="w-full object-cover rounded-lg" src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}" alt="{{ movie.title }}">
+        </a>  
+        <p class="mt-2 text-sm">{{ movie.title }}</p>
+      </div>
+
+    {% endfor %} 
+  </div>
 
   <h4>Anime</h4>
   <ul>

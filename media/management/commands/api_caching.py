@@ -37,7 +37,12 @@ class Command(BaseCommand):
                 release_date = date.fromisoformat(movie["release_date"])
                 Movie.objects.update_or_create(
                     movie_id=movie["id"],
-                    defaults={"title": movie["title"], "release_date": release_date},
+                    defaults={
+                        "title": movie["title"],
+                        "release_date": release_date,
+                        "poster_path": movie["poster_path"],
+                        "backdrop_path": movie["backdrop_path"],
+                    },
                 )
 
         if anime_list:

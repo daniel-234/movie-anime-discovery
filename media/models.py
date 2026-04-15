@@ -33,7 +33,7 @@ class Movie(models.Model):
     adult = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.title
+        return f"{self.title}: image at {self.poster_path}"
 
 
 class Anime(models.Model):
