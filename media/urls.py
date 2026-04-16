@@ -7,6 +7,6 @@ app_name = "media"
 urlpatterns = [
     # movie views
     path("", views.home, name="home"),
-    path("movie/<int:id>/", views.movie_detail, name="movie_detail"),
-    path("anime/<int:id>/", views.anime_detail, name="anime_detail"),
+    path("movie/<slug:movie>/", views.movie_detail, name="movie_detail"),
+    path("anime/<slug:anime>/", views.anime_detail, name="anime_detail"),
 ]

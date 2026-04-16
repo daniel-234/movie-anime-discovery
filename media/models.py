@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 
 class MovieGenre(models.Model):
@@ -19,6 +20,7 @@ class AnimeGenre(models.Model):
 class Movie(models.Model):
     movie_id = models.IntegerField(default=0, unique=True)
     title = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     overview = models.CharField(max_length=250)
     poster_path = models.URLField(blank=True, null=True)
     backdrop_path = models.URLField(blank=True, null=True)
@@ -35,10 +37,25 @@ class Movie(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+
+            while Movie.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)
+
 
 class Anime(models.Model):
     media_id = models.IntegerField(default=0, unique=True)
     title = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     genres = models.ManyToManyField(AnimeGenre)
     cover_image = models.URLField(blank=True, null=True)
     averageScore = models.IntegerField(default=0, null=True, blank=True)
@@ -51,3 +68,17 @@ class Anime(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+
+            while Anime.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
+
+        super().save(*args, **kwargs)

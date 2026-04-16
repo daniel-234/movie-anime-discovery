@@ -6,7 +6,7 @@
   <div class="grid grid-cols-5 gap-4">
     {% for movie in movie_list %}
       <div>
-        <a href="{% url 'media:movie_detail' movie.id %}">
+        <a href="{% url 'media:movie_detail' movie=movie.slug %}">
           <img class="w-full object-cover rounded-lg" src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}" alt="{{ movie.title }}">
         </a>  
         <p class="mt-2 text-sm">{{ movie.title }}</p>
@@ -19,7 +19,7 @@
   <div class="grid grid-cols-5 gap-4">
     {% for anime in anime_list %}
       <div>
-        <a href="{% url 'media:anime_detail' anime.id %}">
+        <a href="{% url 'media:anime_detail' anime=anime.slug %}">
           <img class="w-full object-cover rounded-lg" src="{{ anime.cover_image }}" alt="{{ anime.title }}">
         </a>
         <p class="mt-2 text-sm">{{ anime.title }}</p>

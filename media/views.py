@@ -12,11 +12,11 @@ def home(request):
     return render(request, "media/home.html", context)
 
 
-def movie_detail(request, id):
-    movie = get_object_or_404(Movie, id=id)
+def movie_detail(request, movie):
+    movie = get_object_or_404(Movie, slug=movie)
     return render(request, "media/movie/detail.html", {"movie": movie})
 
 
-def anime_detail(request, id):
-    anime = get_object_or_404(Anime, id=id)
+def anime_detail(request, anime):
+    anime = get_object_or_404(Anime, slug=anime)
     return render(request, "media/anime/detail.html", {"anime": anime})
