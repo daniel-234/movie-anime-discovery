@@ -2,11 +2,14 @@ from django.shortcuts import get_object_or_404, render
 
 from .models import Anime, Movie
 
+POSTERS_PER_ROW = 5
+
 
 def home(request):
     context = {
-        "movie_list": Movie.objects.all()[:5],
-        "anime_list": Anime.objects.all()[:5],
+        "movie_list": Movie.objects.all()[:POSTERS_PER_ROW],
+        "anime_list": Anime.objects.all()[:POSTERS_PER_ROW],
+        "grid_cols_class": f"grid-cols-{POSTERS_PER_ROW}",
     }
 
     return render(request, "media/home.html", context)
