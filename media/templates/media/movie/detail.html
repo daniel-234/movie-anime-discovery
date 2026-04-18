@@ -1,8 +1,10 @@
-{% extends "media/base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ movie.title }}{% endblock %}
 {% block content %}
-    <h1>{{ movie.title }}</h1>
-    <img class="w-64 object-cover rounded-lg" src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}" alt="{{ movie.title }}">
-    {{ movie.overview | linebreaks }}
-    {{ movie.release_date }}
+    <div>
+        <h1>{{ movie.title }}</h1>
+        <img class="w-64 object-cover rounded-lg" src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}" alt="{{ movie.title }}">
+        {{ movie.overview | linebreaks }}
+        {{ movie.release_date }}
+    </div>
 {% endblock %}

@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     media_id=anime["id"],
                     defaults={
                         "title": anime["title"]["english"],
-                        "country_of_origin": anime["countryOfOrigin"],
+                        "country_of_origin": anime["country_of_origin"],
                         "cover_image": anime["cover_image"]["large"],
                     },
                 )

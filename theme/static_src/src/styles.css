@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
 
 /**
   * A catch-all path to Django template files, JavaScript, and Python files

@@ -1,8 +1,10 @@
-{% extends "media/base.html" %}
+{% extends "base.html" %}
+
 {% block title %}Movies{% endblock %}
+
 {% block content %}
   <h2>Trending</h2>
-  <h4>Movies</h4>
+  <h3>Movies</h3>
   <div class="grid {{ grid_cols_class }} gap-4">
     {% for movie in movie_list %}
       <div>
@@ -15,7 +17,7 @@
     {% endfor %} 
   </div>
 
-  <h4>Anime</h4>
+  <h3>Anime</h3>
   <div class="grid grid-cols-5 gap-4">
     {% for anime in anime_list %}
       <div>

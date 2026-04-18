@@ -53,12 +53,12 @@ class Movie(models.Model):
 
 
 class Anime(models.Model):
-    media_id = models.IntegerField(default=0, unique=True)
+    media_id = models.IntegerField(default=0, unique=True, blank=True, null=True)
     title = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     genres = models.ManyToManyField(AnimeGenre)
     cover_image = models.URLField(blank=True, null=True)
-    averageScore = models.IntegerField(default=0, null=True, blank=True)
+    score = models.IntegerField(default=0, null=True, blank=True)
     # TODO Check if there's any specification in the API docs about this value length
     country_of_origin = models.CharField(max_length=3)
     # TODO Check the documentation to see if there are only a defined set of values
