@@ -37,6 +37,7 @@ TMDB_TOKEN = config("TMDB_TOKEN")
 # Application definition
 
 INSTALLED_APPS = [
+    "account",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,7 +45,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "media",
-    "account",
     "tailwind",
     "theme",
 ]
@@ -75,7 +75,7 @@ ROOT_URLCONF = "mysite.urls"
 
 LOGIN_REDIRECT_URL = "dashboard"
 LOGIN_URL = "login"
-LOGOUT_URL = "logout"
+LOGOUT_REDIRECT_URL = "login"
 
 TEMPLATES = [
     {
