@@ -1,37 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow">
-  <h1 class="text-2xl font-bold mb-4">Log in</h1>
-  <form method="post" class="space-y-4">
-    {% csrf_token %}
+<div class="min-h-screen grid place-items-center bg-gray-50 px-4">
+  <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-gray-900 mb-4">Log in</h1>
 
-    <div>
-      <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">
-        Username
-      </label>
-      <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}"
-             class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-             required>
-    </div>
+    <form method="post" class="grid gap-4">
+      {% csrf_token %}
 
-    <div>
-      <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700">
-        Password
-      </label>
-      <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}"
-             class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-400"
-             required>
-    </div>
+      <div>
+        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+          Username
+        </label>
+        {{ form.username }}
+      </div>
 
-    {% if form.non_field_errors %}
-      <div class="text-red-600 text-sm">{{ form.non_field_errors }}</div>
-    {% endif %}
+      <div>
+        <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
+        {{ form.password }}
+      </div>
 
-    <button type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-      Log in
-    </button>
-  </form>
+      {% if form.non_field_errors %}
+        <div class="text-red-600 text-sm">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">
+        Log in
+      </button>
+    </form>
+  </div>
 </div>
 {% endblock %}
