@@ -13,7 +13,6 @@
         </a>  
         <p class="mt-2 text-sm">{{ movie.title }}</p>
       </div>
-
     {% endfor %} 
   </div>
 
@@ -26,5 +25,18 @@
         </a>
         <p class="mt-2 text-sm">{{ anime.title }}</p>
       </div>
-    {% endfor %}    
+    {% endfor %}  
+  </div> 
+    
+  <h3>Manga</h3>
+  <div class="grid grid-cols-5 gap-4">
+    {% for manga in manga_list %}
+      <div>
+        <a href="{% url 'media:manga_detail' manga=manga.slug %}">
+          <img class="w-full object-cover rounded-lg" src="{{ manga.cover_image }}" alt="{{ manga.title }}">
+        </a>
+        <p class="mt-2 text-sm">{{ manga.title }}</p>
+      </div>
+    {% endfor %} 
+  </div>
 {% endblock %}

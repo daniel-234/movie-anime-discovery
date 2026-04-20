@@ -9,4 +9,5 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("movie/<slug:movie>/", views.movie_detail, name="movie_detail"),
     path("anime/<slug:anime>/", views.anime_detail, name="anime_detail"),
+    path("manga/<slug:manga>/", views.manga_detail, name="manga_detail"),
 ]

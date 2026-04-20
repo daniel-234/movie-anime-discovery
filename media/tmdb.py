@@ -68,3 +68,20 @@ def get_anime_list_from_api(query: str, variables: str) -> list[Media] | None:
         except (httpx.HTTPStatusError, httpx.RequestError) as e:
             print(f"Failed to fetch data for {query}: {e}")
             return None
+
+
+def get_manga_list_from_api(query: str, variables: str) -> list[Media] | None:
+    """
+    Retrieve anime and manga information from a AniList API endpoint
+    """
+    with httpx.Client(base_url=ANILIST_API_URL) as client:
+        try:
+            response = client.post("", json={"query": query, "variables": variables})
+            response.raise_for_status()
+            response_data = (
+                response.json().get("data", {}).get("Page", {}).get("media", [])
+            )
+            return response_data
+        except (httpx.HTTPStatusError, httpx.RequestError) as e:
+            print(f"Failed to fetch data for {query}: {e}")
+            return None
