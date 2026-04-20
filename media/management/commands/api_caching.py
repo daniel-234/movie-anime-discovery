@@ -2,11 +2,13 @@ from datetime import date
 
 from django.core.management.base import BaseCommand
 
-from media.models import Anime, Manga, Movie
-from media.tmdb import (
+from media.anilist import (
     AniListVariables,
     get_anime_list_from_api,
     get_manga_list_from_api,
+)
+from media.models import Anime, Manga, Movie
+from media.tmdb import (
     get_movie_list_from_api,
 )
 
