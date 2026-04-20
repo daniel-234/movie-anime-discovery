@@ -55,6 +55,9 @@ class Movie(models.Model):
 class Anime(models.Model):
     media_id = models.IntegerField(default=0, unique=True, blank=True, null=True)
     title = models.CharField(max_length=100)
+    title_english = models.CharField(max_length=100, null=True, blank=True)
+    title_romaji = models.CharField(max_length=100, null=True, blank=True)
+    title_native = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     genres = models.ManyToManyField(AnimeGenre)
     cover_image = models.URLField(blank=True, null=True)
@@ -86,7 +89,10 @@ class Anime(models.Model):
 
 class Manga(models.Model):
     media_id = models.IntegerField(default=0, unique=True, blank=True, null=True)
-    title = models.CharField(max_length=100, blank=True, null=True)
+    title = models.CharField(max_length=100)
+    title_english = models.CharField(max_length=100, null=True, blank=True)
+    title_romaji = models.CharField(max_length=100, null=True, blank=True)
+    title_native = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     genres = models.ManyToManyField(AnimeGenre)
     cover_image = models.URLField(blank=True, null=True)
