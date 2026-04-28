@@ -14,9 +14,9 @@
         <span class="logo text-xl font-bold">Bookmarks</span>
         {% if request.user.is_authenticated %}
         <ul class="menu flex gap-4">
-        <li class="{% if section == 'dashboard' %}font-bold{% endif %}">
-            <a href="{% url 'dashboard' %}">My dashboard</a>
-        </li>
+            <li class="{% if section == 'dashboard' %}font-bold{% endif %}">
+                <a href="{% url 'dashboard' %}">My dashboard</a>
+            </li>
         </ul>
         {% endif %}
         <span class="user">
