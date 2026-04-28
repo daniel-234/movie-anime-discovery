@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ manga.title }}{% endblock %}
+{% block content %}
+    <div>
+        <h1>{{ manga.title }}</h1>
+        <img class="w-64 object-cover rounded-lg" src="{{ manga.cover_image }}" alt="{{ manga.title }}">
+        {{ manga.country_of_origin }}
+    </div>    
+{% endblock %}

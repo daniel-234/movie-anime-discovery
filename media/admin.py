@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Movie, MovieGenre
+from .models import Anime, Manga, Movie, MovieGenre
 
 
 @admin.register(MovieGenre)
@@ -14,3 +14,15 @@ class MovieAdmin(admin.ModelAdmin):
     list_display = ("movie_id", "title", "release_date")
     search_fields = ("title", "overview")
     list_filter = ("release_date",)
+
+
+@admin.register(Anime)
+class AnimeAdmin(admin.ModelAdmin):
+    list_display = ("media_id", "title", "country_of_origin")
+    search_fields = ("title", "country_of_origin")
+
+
+@admin.register(Manga)
+class MangaAdmin(admin.ModelAdmin):
+    list_display = ("media_id", "title", "country_of_origin")
+    search_fields = ("title", "country_of_origin")

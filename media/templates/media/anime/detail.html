@@ -1,6 +1,9 @@
-{% extends "media/base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ anime.title }}{% endblock %}
 {% block content %}
-    <h1>{{ anime.title }}</h1>
-    {{ anime.country_of_origin }}
+    <div>
+        <h1>{{ anime.title }}</h1>
+        <img class="w-64 object-cover rounded-lg" src="{{ anime.cover_image }}" alt="{{ anime.title }}">
+        {{ anime.country_of_origin }}
+    </div>    
 {% endblock %}

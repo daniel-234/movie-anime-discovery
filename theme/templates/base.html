@@ -1,0 +1,41 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Django Tailwind</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% tailwind_css %}
+</head>
+
+<body class="bg-gray-50 text-black font-serif leading-normal tracking-normal">
+    <div id="header" class="flex items-center justify-between p-4 bg-white shadow">
+        <span class="logo text-xl font-bold">Bookmarks</span>
+        {% if request.user.is_authenticated %}
+        <ul class="menu flex gap-4">
+            <li class="{% if section == 'dashboard' %}font-bold{% endif %}">
+                <a href="{% url 'dashboard' %}">My dashboard</a>
+            </li>
+        </ul>
+        {% endif %}
+        <span class="user">
+        {% if request.user.is_authenticated %}
+            Hello {{ request.user.first_name|default:request.user.username }},
+            <form action="{% url 'logout' %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="text-blue-600 hover:underline">Logout</button>
+            </form>
+        {% else %}
+            {% if request.resolver_match.url_name != 'login' %}
+                <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Log-in</a>
+            {% endif %}
+        {% endif %}
+        </span>
+    </div>
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>
