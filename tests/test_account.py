@@ -5,23 +5,21 @@ from account.models import Profile
 
 
 class ProfileSignalTest(TestCase):
-    def test_profile_exixts_for_user(self):
-        user = User.objects.create_user("alice", password="pass1234!")
-        assert user.username == "alice"
-        assert Profile.objects.filter(user=user).exists()
+    def setUp(self):
+        self.user = User.objects.create_user("alice", password="pass1234!")
+
+    def test_profile_exists_for_user(self):
+        assert self.user.username == "alice"
+        self.assertTrue(Profile.objects.filter(user=self.user).exists())
 
     def test_profile_bio(self):
-        user = User.objects.create_user("alice", password="pass1234!")
-        user.profile.bio = "Movie lover"
-        user.save()
+        self.user.profile.bio = "Movie lover"
+        self.user.save()
 
-        user.refresh_from_db()
-        assert user.profile.bio != "Movie lover"
+        self.user.refresh_from_db()
+        assert self.user.profile.bio != "Movie lover"
 
     def test_profile_delete(self):
-        user = User.objects.create_user("alice", password="pass1234!")
-        profile_primary_key = user.profile.pk
+        self.user.delete()
 
-        user.delete()
-
-        self.assertFalse(Profile.objects.filter(pk=profile_primary_key).exists())
+        self.assertTrue(Profile.objects.count() == 0)
