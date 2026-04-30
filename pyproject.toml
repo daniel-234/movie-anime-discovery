@@ -8,6 +8,7 @@ dependencies = [
     "dj-database-url>=3.1.2",
     "django-tailwind[cookiecutter,honcho,reload]>=4.4.2",
     "httpx>=0.28.1",
+    "pytest-django>=4.12.0",
     "python-decouple>=3.8",
 ]
 
@@ -18,3 +19,8 @@ dev = [
     "ruff>=0.15.8",
     "ty>=0.0.26",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "mysite.settings"
+# -- recommended but optional:
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
