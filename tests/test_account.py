@@ -33,17 +33,53 @@ class ProfileSignalTest(TestCase):
 
 class SignupViewTest(TestCase):
     def setUp(self):
-        data = {
+        self.data = {
             "username": "newUser",
             "password1": "Str0ngPass!99",
             "password2": "Str0ngPass!99",
         }
-        self.client.post(reverse("signup"), data)
 
-    def test_get_method(self):
+    def test_get_method_to_signup(self):
         response = self.client.get(reverse("signup"))
         assert response.status_code == 200
         self.assertTemplateUsed(response, "registration/signup.html")
 
-    def test_post_method(self):
+    def test_profile_exists_after_signup(self):
+        response = self.client.post(reverse("signup"), self.data)
+        assert response.status_code == 302
+        assert response["Location"] == reverse("login")
         self.assertTrue(User.objects.filter(username="newUser").exists())
+        self.assertTrue(Profile.objects.count() == 1)
+
+    def test_passwords_do_not_match_in_signup_post(self):
+        self.data["password2"] = "stringPass!00"
+        response = self.client.post(reverse("signup"), self.data)
+        assert response.status_code == 200
+        assert response.status_code != 302
+        self.assertTrue(User.objects.count() == 0)
+
+
+class DashboardViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="dashuser", password="pass1234!")
+
+    def test_anonymous_client_gets_redirected_to_login_page(self):
+        response = self.client.get(reverse("dashboard"))
+        assert response.status_code == 302
+        # Django's @login_required (and LoginRequiredMixin) appends a
+        # ?next=... query string to the login URL so the user can be
+        # sent back to where they were trying to go after logging in
+        expected = f"{reverse('login')}?next={reverse('dashboard')}"
+        assert response["Location"] == expected
+
+    def test_logged_in_client_gets_rendered_the_dashboard(self):
+        self.assertTrue(self.client.login(username="dashuser", password="pass1234!"))
+        response = self.client.get(reverse("dashboard"))
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "account/dashboard.html")
+
+    def test_that_cache_control_header_contains_no_store(self):
+        self.client.login(username="dashuser", password="pass1234!")
+        response = self.client.get(reverse("dashboard"))
+        header = response.get("Cache-Control", "")
+        self.assertIn("no-store", header)
