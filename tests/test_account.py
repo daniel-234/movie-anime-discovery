@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from account.forms import ProfileEditForm, UserEditForm
 from account.models import Profile
 
 
@@ -83,3 +84,101 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard"))
         header = response.get("Cache-Control", "")
         self.assertIn("no-store", header)
+
+
+class ProfileEditViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="edituser", password="pass1234!")
+
+    def test_anonymous_client_gets_redirected_to_login_page(self):
+        response = self.client.get(reverse("edit_profile"))
+        assert response.status_code == 302
+        # Django's @login_required (and LoginRequiredMixin) appends a
+        # ?next=... query string to the login URL so the user can be
+        # sent back to where they were trying to go after logging in
+        expected = f"{reverse('login')}?next={reverse('edit_profile')}"
+        assert response["Location"] == expected
+
+    def test_get_method(self):
+        self.client.login(username="edituser", password="pass1234!")
+        response = self.client.get(reverse("edit_profile"))
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "account/edit_profile.html")
+        self.assertIsInstance(response.context["user_form"], UserEditForm)
+        self.assertIsInstance(response.context["profile_form"], ProfileEditForm)
+
+    def test_valid_post_to_edit(self):
+        self.client.login(username="edituser", password="pass1234!")
+        data = {
+            "first_name": "Mario",
+            "email": "new@example.com",
+            "bio": "I am Super in video games!",
+        }
+        self.client.post(reverse("edit_profile"), data)
+        self.user.refresh_from_db()
+        assert self.user.first_name == "Mario"
+        assert self.user.email == "new@example.com"
+        assert self.user.profile.bio == "I am Super in video games!"
+
+    def test_valid_post_with_redirect(self):
+        self.client.login(username="edituser", password="pass1234!")
+        data = {
+            "first_name": "Mario",
+            "email": "new@example.com",
+            "bio": "I am Super in video games!",
+        }
+        response = self.client.post(reverse("edit_profile"), data, follow=True)
+        # Test that the redirect to the dashboard works
+        self.assertEqual(response.redirect_chain, [(reverse("dashboard"), 302)])
+        # Test that the final page renders successfully
+        assert response.status_code == 200
+        # test that the final page renders with the right template
+        self.assertTemplateUsed(response, "account/dashboard.html")
+
+    def test_valid_post_with_message_for_successful_update(self):
+        self.client.login(username="edituser", password="pass1234!")
+        data = {
+            "first_name": "Mario",
+            "email": "new@example.com",
+            "bio": "I am Super in video games!",
+        }
+        response = self.client.post(reverse("edit_profile"), data, follow=True)
+        messages = list(response.context["messages"])
+        self.assertIn("successfully updated", str(messages[0]))
+
+    def test_post_with_invalid_email_leaves_the_database_unchanged(self):
+        self.client.login(username="edituser", password="pass1234!")
+        data = {
+            "first_name": "Mario",
+            "email": "not-an-email",
+            "bio": "I am Super in video games!",
+        }
+        assert self.user.email == ""
+        response = self.client.post(reverse("edit_profile"), data)
+        assert response.status_code == 200
+        self.user.refresh_from_db()
+        assert self.user.email == ""
+
+
+class LoginLogoutRedirectTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="loginuser", password="pass1234!")
+
+    def test_redirect_to_dashboard_after_posting_valid_credentials(self):
+        response = self.client.post(
+            reverse("login"), {"username": "loginuser", "password": "pass1234!"}
+        )
+        self.assertRedirects(response, reverse("dashboard"))
+
+    def test_redirect_to_login_after_posting_to_logout(self):
+        response = self.client.post(
+            reverse("logout"), {"username": "loginuser", "password": "pass1234!"}
+        )
+        self.assertRedirects(response, reverse("login"))
+
+    def test_posting_wrong_credentials_stays_in_login(self):
+        response = self.client.post(
+            reverse("login"), {"username": "wronguser", "password": "nopass1234!"}
+        )
+        assert response.status_code == 200
+        self.assertTemplateUsed(response, "registration/login.html")
