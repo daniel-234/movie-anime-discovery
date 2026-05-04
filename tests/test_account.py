@@ -6,7 +6,7 @@ from account.forms import ProfileEditForm, UserEditForm
 from account.models import Profile
 
 
-class ProfileSignalTest(TestCase):
+class ProfileSignalAndCascadeTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("alice", password="pass1234!")
 
@@ -15,21 +15,23 @@ class ProfileSignalTest(TestCase):
 
     def test_deleting_user_also_deletes_related_profile_entry(self):
         self.user.delete()
-        self.assertTrue(Profile.objects.count() == 0)
+        self.assertEqual(Profile.objects.count(), 0)
 
     def test_deleting_profile_user_remains(self):
         # cascade delete means you delete the related model
         # but we learned that the user is the parent and the profile
         # is the child, so deleting the profile should not delete the user
         self.user.profile.delete()
-        self.assertTrue(User.objects.count() == 1)
+        self.assertEqual(User.objects.count(), 1)
 
     def test_update_profile(self):
         self.user.profile.update(
             user_data={"username": "bob"}, profile_data={"bio": "Movie lover"}
         )
-        assert self.user.username == "bob"
-        assert self.user.profile.bio == "Movie lover"
+        self.user.refresh_from_db()
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.username, "bob")
+        self.assertEqual(self.user.profile.bio, "Movie lover")
 
 
 class SignupViewTest(TestCase):
@@ -42,22 +44,21 @@ class SignupViewTest(TestCase):
 
     def test_get_method_to_signup(self):
         response = self.client.get(reverse("signup"))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/signup.html")
 
     def test_profile_exists_after_signup(self):
         response = self.client.post(reverse("signup"), self.data)
-        assert response.status_code == 302
-        assert response["Location"] == reverse("login")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], reverse("login"))
         self.assertTrue(User.objects.filter(username="newUser").exists())
         self.assertTrue(Profile.objects.count() == 1)
 
     def test_passwords_do_not_match_in_signup_post(self):
         self.data["password2"] = "stringPass!00"
         response = self.client.post(reverse("signup"), self.data)
-        assert response.status_code == 200
-        assert response.status_code != 302
-        self.assertTrue(User.objects.count() == 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.count(), 0)
 
 
 class DashboardViewTest(TestCase):
@@ -66,17 +67,17 @@ class DashboardViewTest(TestCase):
 
     def test_anonymous_client_gets_redirected_to_login_page(self):
         response = self.client.get(reverse("dashboard"))
-        assert response.status_code == 302
+        self.assertEqual(response.status_code, 302)
         # Django's @login_required (and LoginRequiredMixin) appends a
         # ?next=... query string to the login URL so the user can be
         # sent back to where they were trying to go after logging in
         expected = f"{reverse('login')}?next={reverse('dashboard')}"
-        assert response["Location"] == expected
+        self.assertEqual(response["Location"], expected)
 
     def test_logged_in_client_gets_rendered_the_dashboard(self):
         self.assertTrue(self.client.login(username="dashuser", password="pass1234!"))
         response = self.client.get(reverse("dashboard"))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "account/dashboard.html")
 
     def test_that_cache_control_header_contains_no_store(self):
@@ -89,75 +90,72 @@ class DashboardViewTest(TestCase):
 class ProfileEditViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="edituser", password="pass1234!")
+        self.valid_data = {
+            "first_name": "Mario",
+            "email": "new@example.com",
+            "bio": "I am Super!",
+        }
 
     def test_anonymous_client_gets_redirected_to_login_page(self):
         response = self.client.get(reverse("edit_profile"))
-        assert response.status_code == 302
+        self.assertEqual(response.status_code, 302)
         # Django's @login_required (and LoginRequiredMixin) appends a
         # ?next=... query string to the login URL so the user can be
         # sent back to where they were trying to go after logging in
         expected = f"{reverse('login')}?next={reverse('edit_profile')}"
-        assert response["Location"] == expected
+        self.assertEqual(response["Location"], expected)
 
-    def test_get_method(self):
-        self.client.login(username="edituser", password="pass1234!")
+    def test_edit_profile_forms_rendered_upon_login(self):
+        self.client.force_login(self.user)
         response = self.client.get(reverse("edit_profile"))
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "account/edit_profile.html")
         self.assertIsInstance(response.context["user_form"], UserEditForm)
         self.assertIsInstance(response.context["profile_form"], ProfileEditForm)
 
     def test_valid_post_to_edit(self):
-        self.client.login(username="edituser", password="pass1234!")
-        data = {
-            "first_name": "Mario",
-            "email": "new@example.com",
-            "bio": "I am Super in video games!",
-        }
-        self.client.post(reverse("edit_profile"), data)
+        self.client.force_login(self.user)
+        self.client.post(reverse("edit_profile"), self.valid_data)
         self.user.refresh_from_db()
-        assert self.user.first_name == "Mario"
-        assert self.user.email == "new@example.com"
-        assert self.user.profile.bio == "I am Super in video games!"
+        self.assertEqual(self.user.first_name, "Mario")
+        self.assertEqual(self.user.email, "new@example.com")
+        self.assertEqual(self.user.profile.bio, "I am Super!")
 
     def test_valid_post_with_redirect(self):
-        self.client.login(username="edituser", password="pass1234!")
-        data = {
-            "first_name": "Mario",
-            "email": "new@example.com",
-            "bio": "I am Super in video games!",
-        }
-        response = self.client.post(reverse("edit_profile"), data, follow=True)
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("edit_profile"), self.valid_data, follow=True
+        )
         # Test that the redirect to the dashboard works
         self.assertEqual(response.redirect_chain, [(reverse("dashboard"), 302)])
         # Test that the final page renders successfully
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         # test that the final page renders with the right template
         self.assertTemplateUsed(response, "account/dashboard.html")
 
     def test_valid_post_with_message_for_successful_update(self):
-        self.client.login(username="edituser", password="pass1234!")
-        data = {
-            "first_name": "Mario",
-            "email": "new@example.com",
-            "bio": "I am Super in video games!",
-        }
-        response = self.client.post(reverse("edit_profile"), data, follow=True)
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("edit_profile"), self.valid_data, follow=True
+        )
         messages = list(response.context["messages"])
         self.assertIn("successfully updated", str(messages[0]))
 
     def test_post_with_invalid_email_leaves_the_database_unchanged(self):
-        self.client.login(username="edituser", password="pass1234!")
-        data = {
+        self.client.force_login(self.user)
+        not_valid_data = {
             "first_name": "Mario",
             "email": "not-an-email",
             "bio": "I am Super in video games!",
         }
-        assert self.user.email == ""
-        response = self.client.post(reverse("edit_profile"), data)
-        assert response.status_code == 200
+        self.assertEqual(self.user.email, "")
+        response = self.client.post(reverse("edit_profile"), not_valid_data)
+        self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
-        assert self.user.email == ""
+        self.assertEqual(self.user.email, "")
+        form = response.context["user_form"]
+        self.assertIn("email", form.errors)
+        self.assertEqual(form.errors["email"], ["Enter a valid email address."])
 
 
 class LoginLogoutRedirectTest(TestCase):
@@ -180,5 +178,5 @@ class LoginLogoutRedirectTest(TestCase):
         response = self.client.post(
             reverse("login"), {"username": "wronguser", "password": "nopass1234!"}
         )
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/login.html")
