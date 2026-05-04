@@ -11,24 +11,19 @@
 
 <body class="bg-gray-50 text-black font-serif leading-normal tracking-normal">
     <div id="header" class="flex items-center justify-between p-4 bg-white shadow">
-        <span class="logo text-xl font-bold">Bookmarks</span>
+        <span class="user grid grid-flow-col auto-cols-max items-center gap-3">
         {% if request.user.is_authenticated %}
-        <ul class="menu flex gap-4">
-            <li class="{% if section == 'dashboard' %}font-bold{% endif %}">
-                <a href="{% url 'dashboard' %}">My dashboard</a>
-            </li>
-        </ul>
-        {% endif %}
-        <span class="user">
-        {% if request.user.is_authenticated %}
-            Hello {{ request.user.first_name|default:request.user.username }},
+            <span class="text-sm text-gray-700">Hello {{ request.user.first_name|default:request.user.username }},</span>
             <form action="{% url 'logout' %}" method="post" class="inline">
             {% csrf_token %}
-            <button type="submit" class="text-blue-600 hover:underline">Logout</button>
+            <button type="submit" class="text-sm text-gray-700 hover:text-gray-900">Log out</button>
             </form>
         {% else %}
-            {% if request.resolver_match.url_name != 'login' %}
-                <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Log-in</a>
+            {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'signup' %}
+                <a href="{% url 'login' %}"
+                    class="text-sm font-semibold bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-md transition">
+                    Access
+                </a>
             {% endif %}
         {% endif %}
         </span>
