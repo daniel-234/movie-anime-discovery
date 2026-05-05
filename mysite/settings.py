@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "media",
     "tailwind",
     "theme",
+    "library",
 ]
 
 TAILWIND_APP_NAME = "theme"
