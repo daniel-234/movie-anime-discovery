@@ -10,4 +10,8 @@ urlpatterns = [
     path("movie/<slug:movie_slug>/", views.movie_detail, name="movie_detail"),
     path("anime/<slug:anime_slug>/", views.anime_detail, name="anime_detail"),
     path("manga/<slug:manga_slug>/", views.manga_detail, name="manga_detail"),
+    path("save/<str:content_type>/<int:object_id>/", views.save_item, name="save"),
+    path(
+        "unsave/<str:content_type>/<int:object_id>/", views.unsave_item, name="unsave"
+    ),
 ]
