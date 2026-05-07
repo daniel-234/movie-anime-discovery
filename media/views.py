@@ -49,23 +49,25 @@ def movie_detail(request, movie_slug):
 
 def anime_detail(request, anime_slug):
     anime = get_object_or_404(Anime, slug=anime_slug)
-    is_saved = (
-        request.user.is_authenticated
-        and SavedAnime.objects.filter(user=request.user, anime=anime).exists()
-    )
+    is_bookmarked = _is_bookmarked(request.user, "anime", anime)
     return render(
-        request, "media/anime/detail.html", {"anime": anime, "is_saved": is_saved}
+        request,
+        "media/anime/detail.html",
+        {"anime": anime, "is_bookmarked": is_bookmarked, "content_type": "anime"},
     )
 
 
 def manga_detail(request, manga_slug):
     manga = get_object_or_404(Manga, slug=manga_slug)
-    is_saved = (
-        request.user.is_authenticated
-        and SavedManga.objects.filter(user=request.user, manga=manga).exists()
-    )
+    is_bookmarked = _is_bookmarked(request.user, "manga", manga)
     return render(
-        request, "media/manga/detail.html", {"manga": manga, "is_saved": is_saved}
+        request,
+        "media/manga/detail.html",
+        {
+            "manga": manga,
+            "is_bookmarked": is_bookmarked,
+            "content_type": "manga",
+        },
     )
 
 

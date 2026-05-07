@@ -5,6 +5,6 @@
         <h1>{{ manga.title }}</h1>
         <img class="w-64 object-cover rounded-lg" src="{{ manga.cover_image }}" alt="{{ manga.title }}">
         {{ manga.country_of_origin }}
-        {% include "media/save_button.html" with content_type="manga" object_id=manga.pk %}
+        {% include "media/_bookmark_button.html" with item=manga content_type=content_type is_bookmarked=is_bookmarked %}
     </div>    
 {% endblock %}
