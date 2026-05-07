@@ -14,8 +14,4 @@ urlpatterns = [
         views.toggle_bookmark_movie,
         name="toggle_bookmark_movie",
     ),
-    path("save/<str:content_type>/<int:object_id>/", views.save_item, name="save"),
-    path(
-        "unsave/<str:content_type>/<int:object_id>/", views.unsave_item, name="unsave"
-    ),
 ]
