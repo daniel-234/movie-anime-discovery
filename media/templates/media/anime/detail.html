@@ -5,5 +5,6 @@
         <h1>{{ anime.title }}</h1>
         <img class="w-64 object-cover rounded-lg" src="{{ anime.cover_image }}" alt="{{ anime.title }}">
         {{ anime.country_of_origin }}
+        {% include "media/_bookmark_button.html" with item=anime content_type=content_type is_bookmarked=is_bookmarked %}
     </div>    
 {% endblock %}
