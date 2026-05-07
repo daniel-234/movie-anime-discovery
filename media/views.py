@@ -32,12 +32,11 @@ def home(request):
 
 def movie_detail(request, movie_slug):
     movie = get_object_or_404(Movie, slug=movie_slug)
-    is_saved = (
-        request.user.is_authenticated
-        and SavedMovie.objects.filter(user=request.user, movie=movie).exists()
-    )
+    is_bookmarked = _is_bookmarked(request.user, movie)
     return render(
-        request, "media/movie/detail.html", {"movie": movie, "is_saved": is_saved}
+        request,
+        "media/movie/detail.html",
+        {"movie": movie, "is_bookmarked": is_bookmarked},
     )
 
 
@@ -60,6 +59,30 @@ def manga_detail(request, manga_slug):
     )
     return render(
         request, "media/manga/detail.html", {"manga": manga, "is_saved": is_saved}
+    )
+
+
+def _is_bookmarked(user, movie):
+    """Return True if user has bookmarked this movie."""
+    if not user.is_authenticated:
+        return False
+    return SavedMovie.objects.filter(user=user, movie=movie).exists()
+
+
+@login_required  # type: ignore[no-matching-overload]
+@require_POST  # type: ignore[invalid-argument-type]
+def toggle_bookmark_movie(request: HttpRequest, movie_slug: str) -> HttpResponse:
+    movie = get_object_or_404(Movie, slug=movie_slug)
+    saved, created = SavedMovie.objects.get_or_create(user=request.user, movie=movie)
+    # A row with that media already exists
+    if not created:
+        # Delete the row to unbookmark the media
+        saved.delete()
+    is_bookmarked = created
+    return render(
+        request,
+        "media/_bookmark_button.html",
+        {"movie": movie, "is_bookmarked": is_bookmarked},
     )
 
 

@@ -1,0 +1,16 @@
+<div id="bookmark-button-wrapper">
+  {% if user.is_authenticated %}
+    <button
+      hx-post="{% url 'media:toggle_bookmark_movie' movie_slug=movie.slug %}"
+      hx-target="#bookmark-button-wrapper"
+      hx-swap="outerHTML"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      type="button">
+      {% if is_bookmarked %}
+        ★ Bookmarked
+      {% else %}
+        ☆ Bookmark
+      {% endif %}
+    </button>
+  {% endif %}
+</div>
