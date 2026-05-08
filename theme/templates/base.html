@@ -2,36 +2,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Django Tailwind</title>
+    <title>{% block title %}Discover{% endblock %}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     {% tailwind_css %}
 </head>
 
-<body class="bg-gray-50 text-black font-serif leading-normal tracking-normal">
-    <div id="header" class="flex items-center justify-between p-4 bg-white shadow">
-        <span class="user grid grid-flow-col auto-cols-max items-center gap-3">
-        {% if request.user.is_authenticated %}
-            <span class="text-sm text-gray-700">Hello {{ request.user.first_name|default:request.user.username }},</span>
-            <form action="{% url 'logout' %}" method="post" class="inline">
-            {% csrf_token %}
-            <button type="submit" class="text-sm text-gray-700 hover:text-gray-900">Log out</button>
-            </form>
-        {% else %}
-            {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'signup' %}
-                <a href="{% url 'login' %}"
-                    class="text-sm font-semibold bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 rounded-md transition">
-                    Access
+<body class="bg-cream text-ink font-sans leading-normal antialiased min-h-screen flex flex-col">
+
+    {# ===== Sticky site header ===== #}
+    <header class="sticky top-0 z-40 bg-cream/85 backdrop-blur-md border-b border-line">
+        <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-8">
+
+            {# Wordmark #}
+            <a href="{% url 'media:home' %}" class="font-serif italic text-2xl text-forest tracking-tight hover:text-forest-deep transition-colors">
+                Discover
+            </a>
+
+            {# Primary nav — only includes routes that exist today #}
+            <nav class="hidden sm:flex items-center gap-6">
+                <a href="{% url 'media:home' %}"
+                   class="text-sm font-medium relative py-1
+                          {% if request.resolver_match.url_name == 'home' %}text-ink after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-0.5 after:bg-forest after:rounded-full{% else %}text-ink-2 hover:text-ink{% endif %}">
+                    Home
                 </a>
-            {% endif %}
-        {% endif %}
-        </span>
-    </div>
-    <div id="content">
-        {% block content %}
-        {% endblock %}
-    </div>
+            </nav>
+
+            <div class="flex-1"></div>
+
+            {# User state — same auth logic as before, restyled #}
+            <div class="flex items-center gap-3">
+                {% if request.user.is_authenticated %}
+                    <div class="flex items-center gap-2.5 pl-3 pr-1 py-1 rounded-full border border-line">
+                        <span class="text-sm text-ink-2 hidden sm:inline">
+                            {{ request.user.first_name|default:request.user.username }}
+                        </span>
+                        <div class="w-7 h-7 rounded-full bg-forest text-cream grid place-items-center text-xs font-semibold">
+                            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+                        </div>
+                    </div>
+                    <form action="{% url 'logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-sm text-ink-3 hover:text-ink transition-colors">
+                            Log out
+                        </button>
+                    </form>
+                {% else %}
+                    {% if request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'signup' %}
+                        <a href="{% url 'login' %}"
+                           class="text-sm font-medium bg-forest hover:bg-forest-deep text-cream px-4 py-2 rounded-full transition-colors">
+                            Access
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    {# ===== Page content ===== #}
+    <main id="content" class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    {# ===== Site footer ===== #}
+    <footer class="border-t border-line mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-ink-3">
+            <p class="font-serif italic text-base text-ink-2 mb-1">Discover what's next.</p>
+            <p>Cross-linked from TMDB · AniList · MAL</p>
+        </div>
+    </footer>
+
     <script src="https://unpkg.com/htmx.org@2.0.2"></script>
 </body>
 </html>

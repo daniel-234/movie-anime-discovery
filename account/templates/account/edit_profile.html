@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
+{% block title %}Edit profile — Discover{% endblock %}
+
 {% block content %}
-<div class="min-h-screen grid place-items-center bg-gray-50 px-4">
-  <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4">Edit profile</h2>
+<div class="min-h-screen grid place-items-center bg-cream px-4">
+  <div class="w-full max-w-md bg-cream-soft p-8 rounded-lg border border-line">
+    <h2 class="text-2xl font-bold text-ink mb-4">Edit profile</h2>
 
     <form method="post" class="grid gap-4">
       {% csrf_token %}
 
       {% for field in user_form %}
         <div>
-          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-ink mb-1">
             {{ field.label }}
           </label>
           {{ field }}
@@ -22,7 +24,7 @@
 
       {% for field in profile_form %}
         <div>
-          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-ink mb-1">
             {{ field.label }}
           </label>
           {{ field }}
@@ -32,7 +34,7 @@
         </div>
       {% endfor %}
 
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition">
+      <button type="submit" class="w-full bg-forest hover:bg-forest-deep text-cream font-medium py-2 rounded-md transition-colors">
         Save changes
       </button>
     </form>
