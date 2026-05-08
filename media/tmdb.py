@@ -31,9 +31,30 @@ class Movie(TypedDict):
     vote_count: int
 
 
+class ServiceProviders(TypedDict):
+    display_priority: int
+    logo_path: str
+    provider_name: str
+    provider_id: int
+
+
 def get_movie_list_from_api(endpoint: str) -> list[Movie] | None:
     """
     Retrieve movie information from a TMDB API endpoint
+    """
+    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
+        try:
+            response = client.get(endpoint)
+            response.raise_for_status()
+            return response.json().get("results", [])
+        except (httpx.HTTPStatusError, httpx.RequestError) as e:
+            print(f"Failed to fetch data for {endpoint}: {e}")
+            return None
+
+
+def get_services_list_from_api(endpoint: str) -> list[ServiceProviders] | None:
+    """
+    Retrieve the list of streaming services from a TMDB API endpoint.
     """
     with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
         try:
