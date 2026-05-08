@@ -21,17 +21,18 @@ class ProfileSignalAndCascadeTest(TestCase):
         # cascade delete means you delete the related model
         # but we learned that the user is the parent and the profile
         # is the child, so deleting the profile should not delete the user
-        self.user.profile.delete()
+        Profile.objects.get(user=self.user).delete()
         self.assertEqual(User.objects.count(), 1)
 
     def test_update_profile(self):
-        self.user.profile.update(
+        profile = Profile.objects.get(user=self.user)
+        profile.update(
             user_data={"username": "bob"}, profile_data={"bio": "Movie lover"}
         )
         self.user.refresh_from_db()
-        self.user.profile.refresh_from_db()
+        profile.refresh_from_db()
         self.assertEqual(self.user.username, "bob")
-        self.assertEqual(self.user.profile.bio, "Movie lover")
+        self.assertEqual(profile.bio, "Movie lover")
 
 
 class SignupViewTest(TestCase):
@@ -119,7 +120,7 @@ class ProfileEditViewTest(TestCase):
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "Mario")
         self.assertEqual(self.user.email, "new@example.com")
-        self.assertEqual(self.user.profile.bio, "I am Super!")
+        self.assertEqual(Profile.objects.get(user=self.user).bio, "I am Super!")
 
     def test_valid_post_with_redirect(self):
         self.client.force_login(self.user)

@@ -1,4 +1,7 @@
+from typing import cast
+
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.db.models import Model
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -77,17 +80,24 @@ def _is_bookmarked(user, content_type: str, item) -> bool:
         return False
     _, saved_model, fk_name = _resolve(content_type)
     lookup = {"user": user, fk_name: item}
-    return saved_model.objects.filter(**lookup).exists()  # type: ignore[invalid-argument-type]
+    return saved_model.objects.filter(**lookup).exists()
 
 
-@login_required  # type: ignore[no-matching-overload]
-@require_POST  # type: ignore[invalid-argument-type]
+# Note: django-stubs is built for mypy; ty has known friction with
+# view decorators (require_POST) and **dict unpacks into manager methods.
+# The ty: ignore comments below are intentional, not code smells.
+# See issue #38
+@require_POST  # ty: ignore[invalid-argument-type]
+@login_required
 def toggle_bookmark(request: HttpRequest, content_type: str, slug: str) -> HttpResponse:
     content_model, saved_model, fk_name = _resolve(content_type)
     item = get_object_or_404(content_model, slug=slug)
 
-    lookup = {"user": request.user, fk_name: item}
-    saved, created = saved_model.objects.get_or_create(**lookup)  # type: ignore[invalid-argument-type]
+    user = cast(User, request.user)
+    saved, created = saved_model.objects.get_or_create(
+        user=user,
+        **{fk_name: item},  # ty: ignore[invalid-argument-type]
+    )
     if not created:
         saved.delete()
 

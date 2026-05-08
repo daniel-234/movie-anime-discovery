@@ -9,7 +9,7 @@ urlpatterns = [
     path("movie/<slug:movie_slug>/", views.movie_detail, name="movie_detail"),
     path("anime/<slug:anime_slug>/", views.anime_detail, name="anime_detail"),
     path("manga/<slug:manga_slug>/", views.manga_detail, name="manga_detail"),
-    path(
+    path(  # ty: ignore[no-matching-overload]
         "<str:content_type>/<slug:slug>/bookmark/",
         views.toggle_bookmark,
         name="toggle_bookmark",
