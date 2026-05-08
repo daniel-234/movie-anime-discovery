@@ -187,3 +187,22 @@ class SavedManga(models.Model):
 
     def __str__(self):
         return f"{self.user} saved {self.manga}"
+
+
+class Service(models.Model):
+    """A streaming/rental/purchase service (Netflix, Disney+, etc.).
+
+    Populated from TMDB's /watch/providers/movie endpoint. Provider data
+    originates from JustWatch — attribution required when displaying.
+    """
+
+    tmdb_provider_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=100)
+    logo_path = models.CharField(max_length=200, blank=True)
+    display_priority = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_priority", "name"]
+
+    def __str__(self):
+        return self.name
