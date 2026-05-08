@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "media",
     "tailwind",
     "theme",
+    "django_countries",
 ]
 
 TAILWIND_APP_NAME = "theme"
@@ -137,3 +138,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+
+# Surface popular countries at the top of the dropdown when
+# setting a user's profile country field.
+COUNTRIES_FIRST = [
+    "JP",
+    "US",
+    "GB",
+    "DE",
+    "FR",
+    "IT",
+    "ES",
+    "BR",
+    "MX",
+    "CA",
+    "AU",
+    "KR",
+]
+COUNTRIES_FIRST_BREAK = "──────────"
+COUNTRIES_FIRST_REPEAT = False
