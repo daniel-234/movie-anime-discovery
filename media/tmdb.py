@@ -38,6 +38,15 @@ class ServiceProviders(TypedDict):
     provider_id: int
 
 
+class CountryOffers(TypedDict, total=False):
+    link: str
+    flatrate: list[ServiceProviders]
+    rent: list[ServiceProviders]
+    buy: list[ServiceProviders]
+    ads: list[ServiceProviders]
+    free: list[ServiceProviders]
+
+
 def get_movie_list_from_api(endpoint: str) -> list[Movie] | None:
     """
     Retrieve movie information from a TMDB API endpoint
@@ -63,4 +72,22 @@ def get_services_list_from_api(endpoint: str) -> list[ServiceProviders] | None:
             return response.json().get("results", [])
         except (httpx.HTTPStatusError, httpx.RequestError) as e:
             print(f"Failed to fetch data for {endpoint}: {e}")
+            return None
+
+
+def get_watch_providers_for_movie(
+    movie_id: int,
+) -> dict[str, CountryOffers] | None:
+    """
+    Retrieve watch providers (streaming availability) for a single movie
+    across all countries TMDB tracks.
+    """
+    endpoint = f"/movie/{movie_id}/watch/providers"
+    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
+        try:
+            response = client.get(endpoint)
+            response.raise_for_status()
+            return response.json().get("results", {})
+        except (httpx.HTTPStatusError, httpx.RequestError) as e:
+            print(f"Failed to fetch watch providers for movie {movie_id}: {e}")
             return None
