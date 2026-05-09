@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Anime, Manga, Movie, MovieGenre, SavedAnime, SavedManga, SavedMovie
+from .models import (
+    Anime,
+    Manga,
+    Movie,
+    MovieGenre,
+    SavedAnime,
+    SavedManga,
+    SavedMovie,
+    Service,
+)
 
 
 @admin.register(MovieGenre)
@@ -50,3 +59,9 @@ class SavedMangaAdmin(admin.ModelAdmin):
     list_filter = ("created",)
     search_fields = ("user__username", "manga__title")
     autocomplete_fields = ("user", "manga")
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ("name", "tmdb_provider_id", "display_priority")
+    search_fields = ("name",)
