@@ -206,3 +206,41 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class StreamingOffer(models.Model):
+    class OfferType(models.TextChoices):
+        FLATRATE = "flatrate", "Flatrate"
+        RENT = "rent", "Rent"
+        BUY = "buy", "Buy"
+        ADS = "ads", "Free with ads"
+        FREE = "free", "Free"
+
+    movie = models.ForeignKey(
+        Movie,
+        on_delete=models.CASCADE,
+        related_name="offers",
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.PROTECT,
+        related_name="offers",
+    )
+    country = models.CharField(max_length=2)
+    offer_type = models.CharField(
+        max_length=10,
+        choices=OfferType.choices,
+    )
+    fetched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "service", "country", "offer_type"],
+                name="unique_offer_per_movie_service_country_type",
+            ),
+        ]
+        ordering = ["service__display_priority", "service__name"]
+
+    def __str__(self):
+        return f"{self.movie.title} on {self.service.name} ({self.country}, {self.offer_type})"
