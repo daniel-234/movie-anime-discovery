@@ -9,6 +9,7 @@ from .models import (
     SavedManga,
     SavedMovie,
     Service,
+    StreamingOffer,
 )
 
 
@@ -65,3 +66,10 @@ class SavedMangaAdmin(admin.ModelAdmin):
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ("name", "tmdb_provider_id", "display_priority")
     search_fields = ("name",)
+
+
+@admin.register(StreamingOffer)
+class StreamingOfferAdmin(admin.ModelAdmin):
+    list_display = ("movie", "service", "country", "offer_type", "fetched_at")
+    search_fields = ("movie__title", "service__name")
+    list_filter = ("country", "offer_type")
