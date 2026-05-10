@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from account.models import Profile
+from media.models import StreamingOffer
 from media.services import get_offers_for_movie
 
 from .models import Anime, Manga, Movie, SavedAnime, SavedManga, SavedMovie
@@ -20,6 +21,15 @@ CONTENT_TYPE_MAP: dict[str, tuple[type[Model], type[Model], str]] = {
     "anime": (Anime, SavedAnime, "anime"),
     "manga": (Manga, SavedManga, "manga"),
 }
+
+
+OFFER_TYPE_LABELS = [
+    (StreamingOffer.OfferType.FLATRATE, "Stream"),
+    (StreamingOffer.OfferType.RENT, "Rent"),
+    (StreamingOffer.OfferType.BUY, "Buy"),
+    (StreamingOffer.OfferType.ADS, "Free with ads"),
+    (StreamingOffer.OfferType.FREE, "Free"),
+]
 
 
 def _resolve(content_type: str) -> tuple[type[Model], type[Model], str]:
@@ -45,14 +55,21 @@ def movie_detail(request, movie_slug):
     is_bookmarked = _is_bookmarked(request.user, "movie", movie)
 
     country_code = None
-    grouped_offers = None
+    ordered_offers = None
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
         country_code = profile.country.code
         offers = get_offers_for_movie(movie, country_code)
-        grouped_offers = defaultdict(list)
+
+        grouped = defaultdict(list)
         for offer in offers:
-            grouped_offers[offer.offer_type].append(offer)
+            grouped[offer.offer_type].append(offer)
+
+        ordered_offers = [
+            (label, grouped[offer_type])
+            for offer_type, label in OFFER_TYPE_LABELS
+            if grouped.get(offer_type)
+        ]
 
     return render(
         request,
@@ -62,7 +79,7 @@ def movie_detail(request, movie_slug):
             "is_bookmarked": is_bookmarked,
             "content_type": "movie",
             "country_code": country_code,
-            "grouped_offers": grouped_offers,
+            "ordered_offers": ordered_offers,
         },
     )
 
