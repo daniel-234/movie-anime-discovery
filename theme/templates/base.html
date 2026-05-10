@@ -34,14 +34,21 @@
             {# User state — same auth logic as before, restyled #}
             <div class="flex items-center gap-3">
                 {% if request.user.is_authenticated %}
-                    <div class="flex items-center gap-2.5 pl-3 pr-1 py-1 rounded-full border border-line">
-                        <span class="text-sm text-ink-2 hidden sm:inline">
+                    <a href="{% url 'dashboard' %}"
+                    class="group flex items-center gap-2.5 pl-3 pr-1 py-1 rounded-full border border-line hover:bg-cream-soft hover:border-ink-2 transition-colors">
+                        <span class="text-sm text-ink-2 group-hover:text-ink hidden sm:inline transition-colors">
                             {{ request.user.first_name|default:request.user.username }}
                         </span>
+                        {% if request.user.profile.country %}
+                            <img src="{{ request.user.profile.country.flag }}"
+                                alt="{{ request.user.profile.country.name }}"
+                                title="{{ request.user.profile.country.name }}"
+                                class="h-4 w-auto rounded-sm">
+                        {% endif %}
                         <div class="w-7 h-7 rounded-full bg-forest text-cream grid place-items-center text-xs font-semibold">
                             {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
                         </div>
-                    </div>
+                    </a>
                     <form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
                         <button type="submit" class="text-sm text-ink-3 hover:text-ink transition-colors">
