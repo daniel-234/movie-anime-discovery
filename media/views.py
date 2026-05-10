@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import cast
 
 from django.contrib.auth.decorators import login_required
@@ -6,6 +7,9 @@ from django.db.models import Model
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
+
+from account.models import Profile
+from media.services import get_offers_for_movie
 
 from .models import Anime, Manga, Movie, SavedAnime, SavedManga, SavedMovie
 
@@ -39,6 +43,17 @@ def home(request):
 def movie_detail(request, movie_slug):
     movie = get_object_or_404(Movie, slug=movie_slug)
     is_bookmarked = _is_bookmarked(request.user, "movie", movie)
+
+    country_code = None
+    grouped_offers = None
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        country_code = profile.country.code
+        offers = get_offers_for_movie(movie, country_code)
+        grouped_offers = defaultdict(list)
+        for offer in offers:
+            grouped_offers[offer.offer_type].append(offer)
+
     return render(
         request,
         "media/movie/detail.html",
@@ -46,6 +61,8 @@ def movie_detail(request, movie_slug):
             "movie": movie,
             "is_bookmarked": is_bookmarked,
             "content_type": "movie",
+            "country_code": country_code,
+            "grouped_offers": grouped_offers,
         },
     )
 
