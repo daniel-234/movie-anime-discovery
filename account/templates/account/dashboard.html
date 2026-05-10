@@ -9,7 +9,7 @@
     <p class="text-sm text-ink-2 mb-6">Welcome back, {{ user.first_name|default:user.username }}.</p>
 
     <div class="mb-6">
-      <a href="{% url 'edit_profile' %}"
+      <a href="{% url 'account:edit_profile' %}"
         class="group inline-grid grid-cols-[auto_auto_auto] items-center gap-2 px-3 py-1.5 rounded-full
                 bg-cream border border-line text-sm text-ink
                 hover:bg-cream-soft hover:border-ink-2 transition-colors">
@@ -34,7 +34,7 @@
     {% endif %}
 
     <div class="grid gap-3">
-      <a href="{% url 'edit_profile' %}" class="w-full bg-forest hover:bg-forest-deep text-cream py-2 rounded transition-colors text-center">
+      <a href="{% url 'account:edit_profile' %}" class="w-full bg-forest hover:bg-forest-deep text-cream py-2 rounded transition-colors text-center">
         Edit profile
       </a>
     </div>

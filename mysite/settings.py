@@ -74,9 +74,9 @@ if DEBUG:
 
 ROOT_URLCONF = "mysite.urls"
 
-LOGIN_REDIRECT_URL = "dashboard"
-LOGIN_URL = "login"
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_REDIRECT_URL = "account:dashboard"
+LOGIN_URL = "account:login"
+LOGOUT_REDIRECT_URL = "media:home"
 
 TEMPLATES = [
     {
