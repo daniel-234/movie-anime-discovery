@@ -55,10 +55,12 @@ def movie_detail(request, movie_slug):
     is_bookmarked = _is_bookmarked(request.user, "movie", movie)
 
     country_code = None
+    country_name = None
     ordered_offers = None
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
         country_code = profile.country.code
+        country_name = profile.country.name
         offers = get_offers_for_movie(movie, country_code)
 
         grouped = defaultdict(list)
@@ -79,6 +81,7 @@ def movie_detail(request, movie_slug):
             "is_bookmarked": is_bookmarked,
             "content_type": "movie",
             "country_code": country_code,
+            "country_name": country_name,
             "ordered_offers": ordered_offers,
         },
     )

@@ -1,56 +1,69 @@
 {% extends "base.html" %}
 {% block title %}{{ movie.title }}{% endblock %}
 {% block content %}
-    <div>
-        <h1>{{ movie.title }}</h1>
-        <img class="w-64 object-cover rounded-lg" src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}" alt="{{ movie.title }}">
-        {{ movie.overview | linebreaks }}
-        {{ movie.release_date }}
-        {% include "media/_bookmark_button.html" with item=movie content_type=content_type is_bookmarked=is_bookmarked %}
+<div class="max-w-5xl mx-auto px-4 py-8">
 
-        <section class="mt-8">
-            {% if ordered_offers %}
-                <h2 class="text-lg font-semibold text-ink mb-3">
-                    Where to watch in {{ country_code }}
-                </h2>
+    <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8">
+        <img class="w-64 object-cover rounded-lg border border-line"
+             src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}"
+             alt="{{ movie.title }}">
 
+        <div class="grid gap-3 content-start">
+            <h1 class="text-3xl font-bold text-ink">{{ movie.title }}</h1>
+            <p class="text-sm text-ink-2">{{ movie.release_date }}</p>
+            <div class="text-ink">{{ movie.overview | linebreaks }}</div>
+            <div>
+                {% include "media/_bookmark_button.html" with item=movie content_type=content_type is_bookmarked=is_bookmarked %}
+            </div>
+        </div>
+    </div>
+
+    <section class="mt-10">
+        {% if ordered_offers %}
+            <h2 class="text-lg font-semibold text-ink mb-4">
+                Where to watch in {{ country_name }}
+            </h2>
+
+            <div class="grid gap-4">
                 {% for label, offers in ordered_offers %}
-                    <div class="mb-4">
+                    <div>
                         <h3 class="text-sm font-medium text-ink-2 mb-2">{{ label }}</h3>
-                        <div class="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-2">
+                        <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2">
                             {% for offer in offers %}
                                 <div class="grid grid-cols-[auto_1fr] items-center gap-2 px-3 py-1.5 rounded-md bg-cream border border-line">
                                     <img src="https://image.tmdb.org/t/p/w45{{ offer.service.logo_path }}"
-                                        alt=""
-                                        class="h-6 w-6 rounded-sm">
+                                         alt=""
+                                         class="h-6 w-6 rounded-sm">
                                     <span class="text-sm text-ink truncate">{{ offer.service.name }}</span>
                                 </div>
                             {% endfor %}
                         </div>
                     </div>
                 {% endfor %}
+            </div>
 
-                <p class="text-xs text-ink-2 mt-4">
-                    <a href="https://www.themoviedb.org/movie/{{ movie.movie_id }}/watch?locale={{ country_code }}"
-                       target="_blank" rel="noopener"
-                       class="underline hover:text-ink">See all options</a>
-                    · Source:
-                    <a href="https://www.justwatch.com"
-                       target="_blank" rel="noopener"
-                       class="underline hover:text-ink">JustWatch</a>
-                </p>
+            <p class="text-xs text-ink-2 mt-4">
+                <a href="https://www.themoviedb.org/movie/{{ movie.movie_id }}/watch?locale={{ country_code }}"
+                   target="_blank" rel="noopener"
+                   class="underline hover:text-ink">See all options</a>
+                · Source:
+                <a href="https://www.justwatch.com"
+                   target="_blank" rel="noopener"
+                   class="underline hover:text-ink">JustWatch</a>
+            </p>
 
-            {% elif country_code %}
-                <p class="text-sm text-ink-2">
-                    No streaming availability for {{ country_code }} yet.
-                </p>
+        {% elif country_code %}
+            <p class="text-sm text-ink-2">
+                No streaming availability for {{ country_name }} yet.
+            </p>
 
-            {% else %}
-                <p class="text-sm text-ink-2">
-                    <a href="{% url 'login' %}" class="underline hover:text-ink">Log in</a>
-                    to see availability in your country.
-                </p>
-            {% endif %}
-        </section>
-    </div>
+        {% else %}
+            <p class="text-sm text-ink-2">
+                <a href="{% url 'login' %}" class="underline hover:text-ink">Log in</a>
+                to see availability in your country.
+            </p>
+        {% endif %}
+    </section>
+
+</div>
 {% endblock %}
