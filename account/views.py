@@ -1,13 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-
-######from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect, render
-
-######from django.urls import reverse_lazy
 from django.views.decorators.cache import never_cache
 
-#######Sfrom django.views.generic import CreateView
 from .forms import ProfileEditForm, SignUpForm, SignUpProfileForm, UserEditForm
 
 
@@ -54,7 +49,7 @@ def edit_profile(request):
                 user_form.cleaned_data, profile_form.cleaned_data
             )
             messages.success(request, "Your profile was successfully updated.")
-            return redirect("dashboard")
+            return redirect("account:dashboard")
     else:
         user_form = UserEditForm(instance=request.user)
         profile_form = ProfileEditForm(instance=request.user.profile)
