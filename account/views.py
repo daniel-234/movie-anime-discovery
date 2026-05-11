@@ -1,12 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
-from django.views.decorators.cache import never_cache
-from django.views.generic import CreateView
 
-from .forms import ProfileEditForm, UserEditForm
+######from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import redirect, render
+
+######from django.urls import reverse_lazy
+from django.views.decorators.cache import never_cache
+
+#######Sfrom django.views.generic import CreateView
+from .forms import ProfileEditForm, SignUpForm, SignUpProfileForm, UserEditForm
 
 
 @never_cache
@@ -15,10 +17,30 @@ def dashboard(request):
     return render(request, "account/dashboard.html", {"section": "dashboard"})
 
 
-class SignUpView(CreateView):
-    form_class = UserCreationForm
-    success_url = reverse_lazy("login")
-    template_name = "registration/signup.html"
+def signup(request):
+    if request.method == "POST":
+        user_form = SignUpForm(request.POST)
+        profile_form = SignUpProfileForm(request.POST)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            user.profile.update({}, profile_form.cleaned_data)
+            messages.success(
+                request,
+                "Account created. You can now log in.",
+            )
+            return redirect("account:login")
+    else:
+        user_form = SignUpForm()
+        profile_form = SignUpProfileForm()
+
+    return render(
+        request,
+        "registration/signup.html",
+        {
+            "user_form": user_form,
+            "profile_form": profile_form,
+        },
+    )
 
 
 @never_cache
