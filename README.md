@@ -40,6 +40,14 @@ To populate the database, call the API fetching command.
 make data
 ```
 
+### Get the service providers available in TMDB
+
+To show the services availability in detail pages, it is necessary to run the command to fetch the data
+from the TMDB API.
+```
+make services
+```
+
 ## Run the app
 
 Run the command: 
