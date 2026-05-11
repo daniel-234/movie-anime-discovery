@@ -37,6 +37,18 @@
   --color-forest-deep: #284a30;    /* hover / pressed states */
   --color-forest-soft: #e6ede4;    /* tinted backgrounds, focus rings */
 
+  /* Status — for messages, alerts, validation feedback.
+     Success aliases forest (the brand IS the success color, no need for
+     two greens). Error is a muted brick red sized to sit beside forest
+     in lightness/saturation rather than the more saturated stock reds. */
+  --color-success: #34603f;        /* same as forest */
+  --color-success-deep: #284a30;   /* deep text on success-soft fills */
+  --color-success-soft: #e6ede4;   /* tinted background for success messages */
+
+  --color-error: #8a2d2d;          /* inline error text on cream */
+  --color-error-deep: #6b2424;     /* deep text on error-soft fills */
+  --color-error-soft: #f4e3e1;     /* tinted background for error messages */
+
   /* Category tints — reserved for detail pages and unified views */
   --color-tag-anime-bg: #d4f0e0;
   --color-tag-anime-fg: #0f6b3f;

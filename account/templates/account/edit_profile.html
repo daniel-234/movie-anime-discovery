@@ -17,7 +17,7 @@
           </label>
           {{ field }}
           {% for error in field.errors %}
-            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+            <p class="text-sm text-error mt-1">{{ error }}</p>
           {% endfor %}
         </div>
       {% endfor %}
@@ -29,10 +29,10 @@
           </label>
           {{ field }}
           {% if field.help_text %}
-            <p class="mt-1 text-xs text-gray-500">{{ field.help_text }}</p>
+            <p class="mt-1 text-xs text-ink-3">{{ field.help_text }}</p>
           {% endif %}
           {% for error in field.errors %}
-            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+            <p class="text-sm text-error mt-1">{{ error }}</p>
           {% endfor %}
         </div>
       {% endfor %}
