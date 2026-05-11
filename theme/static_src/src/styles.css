@@ -1,8 +1,6 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/forms";
 
-/* Editorial fonts: Inter for body, Instrument Serif for italic display */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap");
+@plugin "@tailwindcss/forms";
 
 /**
   * Tailwind scans Django templates, JS, and Python for class names.
@@ -60,5 +58,22 @@
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/**
+  * Reusable component classes. Used when a single semantic name is preferred
+  * over scattering utility lists across templates or Python form definitions.
+  *
+  * .form-input — shared styling for every text input, textarea, and select
+  * across account forms (signup, edit profile). Applied via attrs["class"]
+  * in account/forms.py so the styling decision lives here, not in Python.
+  */
+@layer components {
+  .form-input {
+    @apply w-full rounded-md border border-line bg-cream-soft
+           px-3 py-2 text-ink
+           focus:border-forest focus:outline-none
+           focus:ring focus:ring-forest;
   }
 }
