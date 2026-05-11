@@ -23,16 +23,6 @@
       </a>
     </div>
 
-    {% if messages %}
-      <div class="grid gap-2 mb-6">
-        {% for message in messages %}
-          <p class="text-sm p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-            {{ message }}
-          </p>
-        {% endfor %}
-      </div>
-    {% endif %}
-
     <div class="grid gap-3">
       <a href="{% url 'account:edit_profile' %}" class="w-full bg-forest hover:bg-forest-deep text-cream py-2 rounded transition-colors text-center">
         Edit profile

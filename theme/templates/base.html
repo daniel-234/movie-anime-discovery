@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
+ 
     {% comment %}
     Editorial fonts: Inter for body, Instrument Serif for italic display.
     Loaded via <link> rather than CSS @import so the browser can fetch
@@ -16,23 +16,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-
+ 
     {% tailwind_css %}
 </head>
-
+ 
 <body class="bg-cream text-ink font-sans leading-normal antialiased min-h-screen flex flex-col">
-
+ 
     {# ===== Sticky site header ===== #}
     <header class="sticky top-0 z-40 bg-cream/85 backdrop-blur-md border-b border-line">
         <div class="max-w-7xl mx-auto px-6 py-3 flex items-center gap-8">
-
+ 
             {# Wordmark #}
             <a href="{% url 'media:home' %}" class="font-serif italic text-2xl text-forest tracking-tight hover:text-forest-deep transition-colors">
                 Discover
             </a>
-
+ 
             <div class="flex-1"></div>
-
+ 
             {# User state — same auth logic as before, restyled #}
             <div class="flex items-center gap-3">
                 {% if request.user.is_authenticated %}
@@ -68,12 +68,22 @@
             </div>
         </div>
     </header>
-
+ 
     {# ===== Page content ===== #}
     <main id="content" class="flex-1">
+        {% if messages %}
+          <div class="max-w-7xl mx-auto px-6 mt-6 grid gap-2">
+            {% for message in messages %}
+              <p class="text-sm p-3 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                {{ message }}
+              </p>
+            {% endfor %}
+          </div>
+        {% endif %}
+ 
         {% block content %}{% endblock %}
     </main>
-
+ 
     {# ===== Site footer ===== #}
     <footer class="border-t border-line mt-16 py-8">
         <div class="max-w-7xl mx-auto px-6 text-center text-sm text-ink-3">
@@ -81,7 +91,7 @@
             <p>Cross-linked from TMDB · AniList · MAL</p>
         </div>
     </footer>
-
+ 
     <script src="https://unpkg.com/htmx.org@2.0.2"></script>
 </body>
 </html>
