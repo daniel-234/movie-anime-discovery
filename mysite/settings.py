@@ -33,10 +33,6 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost", cast=Csv())
 # Load the .env API variales
 TMDB_TOKEN = config("TMDB_TOKEN")
 
-# List your local IP address to show the debug toolbar
-INTERNAL_IPS = ["127.0.0.1"]
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -47,7 +43,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "debug_toolbar",
     "media",
     "tailwind",
     "theme",
@@ -61,7 +56,6 @@ if DEBUG:
     INSTALLED_APPS += ["django_browser_reload"]
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -76,6 +70,18 @@ if DEBUG:
     MIDDLEWARE += [
         "django_browser_reload.middleware.BrowserReloadMiddleware",
     ]
+
+ENABLE_DEBUG_TOOLBAR = config("ENABLE_DEBUG_TOOLBAR", default=False, cast=bool)
+if DEBUG and ENABLE_DEBUG_TOOLBAR:
+    INTERNAL_IPS = ["127.0.0.1"]
+    INSTALLED_APPS.insert(
+        INSTALLED_APPS.index("django.contrib.staticfiles") + 1,
+        "debug_toolbar",
+    )
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.middleware.common.CommonMiddleware") + 1,
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    )
 
 ROOT_URLCONF = "mysite.urls"
 
