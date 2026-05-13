@@ -22,34 +22,53 @@ def get_offers_for_movie(movie: Movie, country: str) -> QuerySet[StreamingOffer]
         movie=movie,
         country=country,
         fetched_at__gte=cutoff,
-    )
+    ).select_related("service")
+
     if fresh_offers.exists():
         return fresh_offers
 
     data = get_watch_providers_for_movie(movie.movie_id)
     if data is None:
-        return StreamingOffer.objects.filter(movie=movie, country=country)
+        return StreamingOffer.objects.filter(
+            movie=movie, country=country
+        ).select_related("service")
 
     country_data = data.get(country, {})
 
-    StreamingOffer.objects.filter(movie=movie, country=country).delete()
+    # Gather every provider ID we might need
+    provider_ids = {
+        p["provider_id"]
+        for ot in StreamingOffer.OfferType.values
+        for p in country_data.get(ot, [])
+    }
 
+    # Run one query to fetch all the matching rows at once
+    services_by_id = {
+        s.tmdb_provider_id: s
+        for s in Service.objects.filter(tmdb_provider_id__in=provider_ids)
+    }
+
+    offers_to_create = []
     for offer_type_key in StreamingOffer.OfferType.values:
         for provider in country_data.get(offer_type_key, []):
-            try:
-                service = Service.objects.get(tmdb_provider_id=provider["provider_id"])
-            except Service.DoesNotExist:
+            service = services_by_id.get(provider["provider_id"])
+            if service is None:
                 print(
                     f"Unknown service tmdb_provider_id={provider['provider_id']}; "
                     f"run sync_services"
                 )
                 continue
 
-            StreamingOffer.objects.create(
-                movie=movie,
-                service=service,
-                country=country,
-                offer_type=offer_type_key,
+            offers_to_create.append(
+                StreamingOffer(
+                    movie=movie,
+                    service=service,
+                    country=country,
+                    offer_type=offer_type_key,
+                )
             )
-
-    return StreamingOffer.objects.filter(movie=movie, country=country)
+    StreamingOffer.objects.filter(movie=movie, country=country).delete()
+    StreamingOffer.objects.bulk_create(offers_to_create)
+    return StreamingOffer.objects.filter(movie=movie, country=country).select_related(
+        "service"
+    )

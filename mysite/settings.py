@@ -33,6 +33,9 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost", cast=Csv())
 # Load the .env API variales
 TMDB_TOKEN = config("TMDB_TOKEN")
 
+# List your local IP address to show the debug toolbar
+INTERNAL_IPS = ["127.0.0.1"]
+
 
 # Application definition
 
@@ -44,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "media",
     "tailwind",
     "theme",
@@ -57,6 +61,7 @@ if DEBUG:
     INSTALLED_APPS += ["django_browser_reload"]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
