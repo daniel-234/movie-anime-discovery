@@ -31,7 +31,7 @@ class Movie(TypedDict):
     vote_count: int
 
 
-class ServiceProviders(TypedDict):
+class ServiceProvider(TypedDict):
     display_priority: int
     logo_path: str
     provider_name: str
@@ -40,11 +40,11 @@ class ServiceProviders(TypedDict):
 
 class CountryOffers(TypedDict, total=False):
     link: str
-    flatrate: list[ServiceProviders]
-    rent: list[ServiceProviders]
-    buy: list[ServiceProviders]
-    ads: list[ServiceProviders]
-    free: list[ServiceProviders]
+    flatrate: list[ServiceProvider]
+    rent: list[ServiceProvider]
+    buy: list[ServiceProvider]
+    ads: list[ServiceProvider]
+    free: list[ServiceProvider]
 
 
 def get_movie_list_from_api(endpoint: str) -> list[Movie] | None:
@@ -61,7 +61,7 @@ def get_movie_list_from_api(endpoint: str) -> list[Movie] | None:
             return None
 
 
-def get_services_list_from_api(endpoint: str) -> list[ServiceProviders] | None:
+def get_services_list_from_api(endpoint: str) -> list[ServiceProvider] | None:
     """
     Retrieve the list of streaming services from a TMDB API endpoint.
     """

@@ -12,16 +12,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         services = get_services_list_from_api(WATCH_PROVIDERS_MOVIE)
 
-        if services:
-            for service in services:
-                Service.objects.update_or_create(
-                    tmdb_provider_id=service["provider_id"],
-                    defaults={
-                        "name": service["provider_name"],
-                        "logo_path": service.get("logo_path", ""),
-                        "display_priority": service.get("display_priority", 0),
-                    },
-                )
-            self.stdout.write(f"Synced {len(services)} services from TMDB.")
-        else:
+        if not services:
             self.stdout.write("No services returned from TMDB.")
+            return
+
+        for service in services:
+            Service.objects.update_or_create(
+                tmdb_provider_id=service["provider_id"],
+                defaults={
+                    "name": service["provider_name"],
+                    "logo_path": service.get("logo_path", ""),
+                    "display_priority": service.get("display_priority", 0),
+                },
+            )
+        self.stdout.write(f"Synced {len(services)} services from TMDB.")

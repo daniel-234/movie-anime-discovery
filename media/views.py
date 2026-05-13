@@ -1,8 +1,6 @@
 from collections import defaultdict
-from typing import cast
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.db.models import Model
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -116,8 +114,7 @@ def _is_bookmarked(user, content_type: str, item) -> bool:
     if not user.is_authenticated:
         return False
     _, saved_model, fk_name = _resolve(content_type)
-    lookup = {"user": user, fk_name: item}
-    return saved_model.objects.filter(**lookup).exists()
+    return saved_model.objects.filter(user=user, **{fk_name: item}).exists()
 
 
 # Note: django-stubs is built for mypy; ty has known friction with
@@ -130,13 +127,15 @@ def toggle_bookmark(request: HttpRequest, content_type: str, slug: str) -> HttpR
     content_model, saved_model, fk_name = _resolve(content_type)
     item = get_object_or_404(content_model, slug=slug)
 
-    user = cast(User, request.user)
-    saved, created = saved_model.objects.get_or_create(
-        user=user,
-        **{fk_name: item},  # ty: ignore[invalid-argument-type]
-    )
-    if not created:
-        saved.delete()
+    # Check if the model already exists
+    queryset = saved_model.objects.filter(user=request.user, **{fk_name: item})
+
+    if queryset.exists():
+        queryset.delete()
+        created = False
+    else:
+        saved_model.objects.create(user=request.user, **{fk_name: item})
+        created = True
 
     return render(
         request,
