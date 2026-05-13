@@ -33,6 +33,9 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost", cast=Csv())
 # Load the .env API variales
 TMDB_TOKEN = config("TMDB_TOKEN")
 
+# List your local IP address to show the debug toolbar
+INTERNAL_IPS = ["127.0.0.1"]
+
 
 # Application definition
 
@@ -44,9 +47,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "media",
     "tailwind",
     "theme",
+    "django_countries",
 ]
 
 TAILWIND_APP_NAME = "theme"
@@ -56,6 +61,7 @@ if DEBUG:
     INSTALLED_APPS += ["django_browser_reload"]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -73,9 +79,9 @@ if DEBUG:
 
 ROOT_URLCONF = "mysite.urls"
 
-LOGIN_REDIRECT_URL = "dashboard"
-LOGIN_URL = "login"
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_REDIRECT_URL = "account:dashboard"
+LOGIN_URL = "account:login"
+LOGOUT_REDIRECT_URL = "media:home"
 
 TEMPLATES = [
     {
@@ -137,3 +143,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+
+# Surface popular countries at the top of the dropdown when
+# setting a user's profile country field.
+COUNTRIES_FIRST = [
+    "JP",
+    "US",
+    "GB",
+    "DE",
+    "FR",
+    "IT",
+    "ES",
+    "BR",
+    "MX",
+    "CA",
+    "AU",
+    "KR",
+]
+COUNTRIES_FIRST_BREAK = "──────────"
+COUNTRIES_FIRST_REPEAT = False

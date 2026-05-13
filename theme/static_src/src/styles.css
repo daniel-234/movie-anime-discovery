@@ -1,12 +1,91 @@
 @import "tailwindcss";
+
 @plugin "@tailwindcss/forms";
 
-
 /**
-  * A catch-all path to Django template files, JavaScript, and Python files
-  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
-  *
-  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
-  * the scope of this path.
+  * Tailwind scans Django templates, JS, and Python for class names.
   */
 @source "../../../**/*.{html,py,js}";
+
+/**
+  * Discover theme tokens — extends Tailwind's default palette with a warm
+  * editorial cream surface, forest-green brand accent, and warm near-black ink.
+  *
+  * In Tailwind v4 these become utilities automatically:
+  *   bg-cream        → var(--color-cream)
+  *   text-ink        → var(--color-ink)
+  *   bg-forest       → var(--color-forest)
+  *   font-serif      → var(--font-serif)  (overridden below)
+  *
+  * Category accent colors are defined for future use on detail pages or
+  * unified browse views — not used on the home page itself.
+  */
+@theme {
+  /* Surfaces */
+  --color-cream: #f6f3ec;          /* page background */
+  --color-cream-soft: #faf7f0;     /* raised surfaces (cards, headers) */
+  --color-line: #e8e3d8;           /* hairline borders */
+  --color-line-soft: #efeae0;      /* subtler dividers */
+
+  /* Text */
+  --color-ink: #1f1d18;            /* warm near-black, body text */
+  --color-ink-2: #4a4744;          /* secondary text */
+  --color-ink-3: #8a8580;          /* muted / hints */
+
+  /* Brand accent */
+  --color-forest: #34603f;         /* primary brand / buttons / links */
+  --color-forest-deep: #284a30;    /* hover / pressed states */
+  --color-forest-soft: #e6ede4;    /* tinted backgrounds, focus rings */
+
+  /* Status — for messages, alerts, validation feedback.
+     Success aliases forest (the brand IS the success color, no need for
+     two greens). Error is a muted brick red sized to sit beside forest
+     in lightness/saturation rather than the more saturated stock reds. */
+  --color-success: #34603f;        /* same as forest */
+  --color-success-deep: #284a30;   /* deep text on success-soft fills */
+  --color-success-soft: #e6ede4;   /* tinted background for success messages */
+
+  --color-error: #8a2d2d;          /* inline error text on cream */
+  --color-error-deep: #6b2424;     /* deep text on error-soft fills */
+  --color-error-soft: #f4e3e1;     /* tinted background for error messages */
+
+  /* Category tints — reserved for detail pages and unified views */
+  --color-tag-anime-bg: #d4f0e0;
+  --color-tag-anime-fg: #0f6b3f;
+  --color-tag-movie-bg: #dbeafe;
+  --color-tag-movie-fg: #1e40af;
+  --color-tag-manga-bg: #ede0fa;
+  --color-tag-manga-fg: #6b21a8;
+
+  /* Typography */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+}
+
+/**
+  * Hide the horizontal scrollbar on carousels while keeping scroll behavior.
+  * Used by .scrollbar-none utility on home page card rows.
+  */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/**
+  * Reusable component classes. Used when a single semantic name is preferred
+  * over scattering utility lists across templates or Python form definitions.
+  *
+  * .form-input — shared styling for every text input, textarea, and select
+  * across account forms (signup, edit profile). Applied via attrs["class"]
+  * in account/forms.py so the styling decision lives here, not in Python.
+  */
+@layer components {
+  .form-input {
+    @apply w-full rounded-md border border-line bg-cream-soft
+           px-3 py-2 text-ink
+           focus:border-forest focus:outline-none
+           focus:ring focus:ring-forest;
+  }
+}

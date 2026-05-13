@@ -1,42 +1,116 @@
 {% extends "base.html" %}
 
-{% block title %}Movies{% endblock %}
+{% block title %}Home — Discover{% endblock %}
 
 {% block content %}
-  <h2>Trending</h2>
-  <h3>Movies</h3>
-  <div class="grid {{ grid_cols_class }} gap-4">
-    {% for movie in movie_list %}
-      <div>
-        <a href="{% url 'media:movie_detail' movie_slug=movie.slug %}">
-          <img class="w-full object-cover rounded-lg" src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}" alt="{{ movie.title }}">
-        </a>  
-        <p class="mt-2 text-sm">{{ movie.title }}</p>
-      </div>
-    {% endfor %} 
-  </div>
+<div class="max-w-7xl mx-auto px-6 py-10 space-y-14">
 
-  <h3>Anime</h3>
-  <div class="grid grid-cols-5 gap-4">
-    {% for anime in anime_list %}
-      <div>
-        <a href="{% url 'media:anime_detail' anime_slug=anime.slug %}">
-          <img class="w-full object-cover rounded-lg" src="{{ anime.cover_image }}" alt="{{ anime.title }}">
-        </a>
-        <p class="mt-2 text-sm">{{ anime.title }}</p>
-      </div>
-    {% endfor %}  
-  </div> 
-    
-  <h3>Manga</h3>
-  <div class="grid grid-cols-5 gap-4">
-    {% for manga in manga_list %}
-      <div>
-        <a href="{% url 'media:manga_detail' manga_slug=manga.slug %}">
-          <img class="w-full object-cover rounded-lg" src="{{ manga.cover_image }}" alt="{{ manga.title }}">
-        </a>
-        <p class="mt-2 text-sm">{{ manga.title }}</p>
-      </div>
-    {% endfor %} 
-  </div>
+    {# Trending movies #}
+    <section>
+        <div class="flex items-end justify-between gap-6 mb-6">
+            <div>
+                <h2 class="font-serif text-3xl text-ink leading-tight">Trending movies</h2>
+                <p class="text-sm text-ink-3 mt-1">Popular this week</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="#" class="text-sm font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
+                    See all <span aria-hidden="true">→</span>
+                </a>
+                <div class="flex gap-2">
+                    <button type="button" data-scroll="movies" data-dir="-1" aria-label="Scroll left"
+                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button type="button" data-scroll="movies" data-dir="1" aria-label="Scroll right"
+                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="movies" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
+            {% for movie in movie_list %}
+                {% url 'media:movie_detail' movie_slug=movie.slug as detail_url %}
+                {% include "media/_card.html" with item=movie rank=forloop.counter detail_url=detail_url %}
+            {% endfor %}
+        </div>
+    </section>
+
+    {# Trending anime #}
+    <section>
+        <div class="flex items-end justify-between gap-6 mb-6">
+            <div>
+                <h2 class="font-serif text-3xl text-ink leading-tight">Trending anime</h2>
+                <p class="text-sm text-ink-3 mt-1">Top series airing now</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="#" class="text-sm font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
+                    See all <span aria-hidden="true">→</span>
+                </a>
+                <div class="flex gap-2">
+                    <button type="button" data-scroll="anime" data-dir="-1" aria-label="Scroll left"
+                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button type="button" data-scroll="anime" data-dir="1" aria-label="Scroll right"
+                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="anime" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
+            {% for anime in anime_list %}
+                {% url 'media:anime_detail' anime_slug=anime.slug as detail_url %}
+                {% include "media/_card.html" with item=anime rank=forloop.counter detail_url=detail_url %}
+            {% endfor %}
+        </div>
+    </section>
+
+    {# Trending manga #}
+    <section>
+        <div class="flex items-end justify-between gap-6 mb-6">
+            <div>
+                <h2 class="font-serif text-3xl text-ink leading-tight">Trending manga</h2>
+                <p class="text-sm text-ink-3 mt-1">Most read this month</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="#" class="text-sm font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
+                    See all <span aria-hidden="true">→</span>
+                </a>
+                <div class="flex gap-2">
+                    <button type="button" data-scroll="manga" data-dir="-1" aria-label="Scroll left"
+                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <button type="button" data-scroll="manga" data-dir="1" aria-label="Scroll right"
+                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="manga" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
+            {% for manga in manga_list %}
+                {% url 'media:manga_detail' manga_slug=manga.slug as detail_url %}
+                {% include "media/_card.html" with item=manga rank=forloop.counter detail_url=detail_url %}
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+<script>
+    document.querySelectorAll('button[data-scroll]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var target = document.getElementById(btn.dataset.scroll);
+            if (!target) return;
+            var dir = parseInt(btn.dataset.dir, 10) || 1;
+            target.scrollBy({ left: dir * 600, behavior: 'smooth' });
+        });
+    });
+</script>
 {% endblock %}

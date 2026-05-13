@@ -21,17 +21,18 @@ class ProfileSignalAndCascadeTest(TestCase):
         # cascade delete means you delete the related model
         # but we learned that the user is the parent and the profile
         # is the child, so deleting the profile should not delete the user
-        self.user.profile.delete()
+        Profile.objects.get(user=self.user).delete()
         self.assertEqual(User.objects.count(), 1)
 
     def test_update_profile(self):
-        self.user.profile.update(
+        profile = Profile.objects.get(user=self.user)
+        profile.update(
             user_data={"username": "bob"}, profile_data={"bio": "Movie lover"}
         )
         self.user.refresh_from_db()
-        self.user.profile.refresh_from_db()
+        profile.refresh_from_db()
         self.assertEqual(self.user.username, "bob")
-        self.assertEqual(self.user.profile.bio, "Movie lover")
+        self.assertEqual(profile.bio, "Movie lover")
 
 
 class SignupViewTest(TestCase):
@@ -43,20 +44,20 @@ class SignupViewTest(TestCase):
         }
 
     def test_get_method_to_signup(self):
-        response = self.client.get(reverse("signup"))
+        response = self.client.get(reverse("account:signup"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/signup.html")
 
     def test_profile_exists_after_signup(self):
-        response = self.client.post(reverse("signup"), self.data)
+        response = self.client.post(reverse("account:signup"), self.data)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response["Location"], reverse("login"))
+        self.assertEqual(response["Location"], reverse("account:login"))
         self.assertTrue(User.objects.filter(username="newUser").exists())
         self.assertTrue(Profile.objects.count() == 1)
 
     def test_passwords_do_not_match_in_signup_post(self):
         self.data["password2"] = "stringPass!00"
-        response = self.client.post(reverse("signup"), self.data)
+        response = self.client.post(reverse("account:signup"), self.data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(User.objects.count(), 0)
 
@@ -66,23 +67,23 @@ class DashboardViewTest(TestCase):
         self.user = User.objects.create_user(username="dashuser", password="pass1234!")
 
     def test_anonymous_client_gets_redirected_to_login_page(self):
-        response = self.client.get(reverse("dashboard"))
+        response = self.client.get(reverse("account:dashboard"))
         self.assertEqual(response.status_code, 302)
         # Django's @login_required (and LoginRequiredMixin) appends a
         # ?next=... query string to the login URL so the user can be
         # sent back to where they were trying to go after logging in
-        expected = f"{reverse('login')}?next={reverse('dashboard')}"
+        expected = f"{reverse('account:login')}?next={reverse('account:dashboard')}"
         self.assertEqual(response["Location"], expected)
 
     def test_logged_in_client_gets_rendered_the_dashboard(self):
         self.assertTrue(self.client.login(username="dashuser", password="pass1234!"))
-        response = self.client.get(reverse("dashboard"))
+        response = self.client.get(reverse("account:dashboard"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "account/dashboard.html")
 
     def test_that_cache_control_header_contains_no_store(self):
         self.client.login(username="dashuser", password="pass1234!")
-        response = self.client.get(reverse("dashboard"))
+        response = self.client.get(reverse("account:dashboard"))
         header = response.get("Cache-Control", "")
         self.assertIn("no-store", header)
 
@@ -97,17 +98,17 @@ class ProfileEditViewTest(TestCase):
         }
 
     def test_anonymous_client_gets_redirected_to_login_page(self):
-        response = self.client.get(reverse("edit_profile"))
+        response = self.client.get(reverse("account:edit_profile"))
         self.assertEqual(response.status_code, 302)
         # Django's @login_required (and LoginRequiredMixin) appends a
         # ?next=... query string to the login URL so the user can be
         # sent back to where they were trying to go after logging in
-        expected = f"{reverse('login')}?next={reverse('edit_profile')}"
+        expected = f"{reverse('account:login')}?next={reverse('account:edit_profile')}"
         self.assertEqual(response["Location"], expected)
 
     def test_edit_profile_forms_rendered_upon_login(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse("edit_profile"))
+        response = self.client.get(reverse("account:edit_profile"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "account/edit_profile.html")
         self.assertIsInstance(response.context["user_form"], UserEditForm)
@@ -115,19 +116,19 @@ class ProfileEditViewTest(TestCase):
 
     def test_valid_post_to_edit(self):
         self.client.force_login(self.user)
-        self.client.post(reverse("edit_profile"), self.valid_data)
+        self.client.post(reverse("account:edit_profile"), self.valid_data)
         self.user.refresh_from_db()
         self.assertEqual(self.user.first_name, "Mario")
         self.assertEqual(self.user.email, "new@example.com")
-        self.assertEqual(self.user.profile.bio, "I am Super!")
+        self.assertEqual(Profile.objects.get(user=self.user).bio, "I am Super!")
 
     def test_valid_post_with_redirect(self):
         self.client.force_login(self.user)
         response = self.client.post(
-            reverse("edit_profile"), self.valid_data, follow=True
+            reverse("account:edit_profile"), self.valid_data, follow=True
         )
         # Test that the redirect to the dashboard works
-        self.assertEqual(response.redirect_chain, [(reverse("dashboard"), 302)])
+        self.assertEqual(response.redirect_chain, [(reverse("account:dashboard"), 302)])
         # Test that the final page renders successfully
         self.assertEqual(response.status_code, 200)
         # test that the final page renders with the right template
@@ -136,7 +137,7 @@ class ProfileEditViewTest(TestCase):
     def test_valid_post_with_message_for_successful_update(self):
         self.client.force_login(self.user)
         response = self.client.post(
-            reverse("edit_profile"), self.valid_data, follow=True
+            reverse("account:edit_profile"), self.valid_data, follow=True
         )
         messages = list(response.context["messages"])
         self.assertIn("successfully updated", str(messages[0]))
@@ -149,7 +150,7 @@ class ProfileEditViewTest(TestCase):
             "bio": "I am Super in video games!",
         }
         self.assertEqual(self.user.email, "")
-        response = self.client.post(reverse("edit_profile"), not_valid_data)
+        response = self.client.post(reverse("account:edit_profile"), not_valid_data)
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
         self.assertEqual(self.user.email, "")
@@ -164,19 +165,21 @@ class LoginLogoutRedirectTest(TestCase):
 
     def test_redirect_to_dashboard_after_posting_valid_credentials(self):
         response = self.client.post(
-            reverse("login"), {"username": "loginuser", "password": "pass1234!"}
+            reverse("account:login"), {"username": "loginuser", "password": "pass1234!"}
         )
-        self.assertRedirects(response, reverse("dashboard"))
+        self.assertRedirects(response, reverse("account:dashboard"))
 
     def test_redirect_to_login_after_posting_to_logout(self):
         response = self.client.post(
-            reverse("logout"), {"username": "loginuser", "password": "pass1234!"}
+            reverse("account:logout"),
+            {"username": "loginuser", "password": "pass1234!"},
         )
-        self.assertRedirects(response, reverse("login"))
+        self.assertRedirects(response, reverse("account:login"))
 
     def test_posting_wrong_credentials_stays_in_login(self):
         response = self.client.post(
-            reverse("login"), {"username": "wronguser", "password": "nopass1234!"}
+            reverse("account:login"),
+            {"username": "wronguser", "password": "nopass1234!"},
         )
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "registration/login.html")

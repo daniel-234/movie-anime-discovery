@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
@@ -120,3 +121,126 @@ class Manga(models.Model):
             self.slug = slug
 
         super().save(*args, **kwargs)
+
+
+class SavedMovie(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_movies"
+    )
+    movie = models.ForeignKey(
+        "media.Movie", on_delete=models.CASCADE, related_name="saves"
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "movie"], name="unique_user_movie_save"
+            )
+        ]
+        ordering = ["-created"]
+        indexes = [models.Index(fields=["user", "-created"])]
+
+    def __str__(self):
+        return f"{self.user} saved {self.movie}"
+
+
+class SavedAnime(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_anime"
+    )
+    anime = models.ForeignKey(
+        "media.Anime", on_delete=models.CASCADE, related_name="saves"
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "anime"], name="unique_user_anime_save"
+            )
+        ]
+        ordering = ["-created"]
+        indexes = [models.Index(fields=["user", "-created"])]
+
+    def __str__(self):
+        return f"{self.user} saved {self.anime}"
+
+
+class SavedManga(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_manga"
+    )
+    manga = models.ForeignKey(
+        "media.Manga", on_delete=models.CASCADE, related_name="saves"
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "manga"], name="unique_user_manga_save"
+            )
+        ]
+        ordering = ["-created"]
+        indexes = [models.Index(fields=["user", "-created"])]
+
+    def __str__(self):
+        return f"{self.user} saved {self.manga}"
+
+
+class Service(models.Model):
+    """A streaming/rental/purchase service (Netflix, Disney+, etc.).
+
+    Populated from TMDB's /watch/providers/movie endpoint. Provider data
+    originates from JustWatch — attribution required when displaying.
+    """
+
+    tmdb_provider_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=100)
+    logo_path = models.CharField(max_length=200, blank=True)
+    display_priority = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_priority", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class StreamingOffer(models.Model):
+    class OfferType(models.TextChoices):
+        FLATRATE = "flatrate", "Flatrate"
+        RENT = "rent", "Rent"
+        BUY = "buy", "Buy"
+        ADS = "ads", "Free with ads"
+        FREE = "free", "Free"
+
+    movie = models.ForeignKey(
+        Movie,
+        on_delete=models.CASCADE,
+        related_name="offers",
+    )
+    service = models.ForeignKey(
+        Service,
+        on_delete=models.PROTECT,
+        related_name="offers",
+    )
+    country = models.CharField(max_length=2)
+    offer_type = models.CharField(
+        max_length=10,
+        choices=OfferType.choices,
+    )
+    fetched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["movie", "service", "country", "offer_type"],
+                name="unique_offer_per_movie_service_country_type",
+            ),
+        ]
+        ordering = ["service__display_priority", "service__name"]
+
+    def __str__(self):
+        return f"{self.movie.title} on {self.service.name} ({self.country}, {self.offer_type})"

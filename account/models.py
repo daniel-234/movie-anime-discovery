@@ -2,11 +2,15 @@ from django.contrib.auth.models import User
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django_countries.fields import CountryField
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
+    country = CountryField(
+        default="US", help_text="Used to show local streaming availability."
+    )
 
     @transaction.atomic
     def update(self, user_data: dict, profile_data: dict) -> None:
