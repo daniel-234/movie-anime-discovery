@@ -6,7 +6,6 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
-from account.models import Profile
 from media.models import StreamingOffer
 from media.services import get_offers_for_movie
 
@@ -56,9 +55,8 @@ def movie_detail(request, movie_slug):
     country_name = None
     ordered_offers = None
     if request.user.is_authenticated:
-        profile = Profile.objects.get(user=request.user)
-        country_code = profile.country.code
-        country_name = profile.country.name
+        country_code = request.user.profile.country.code
+        country_name = request.user.profile.country.name
         offers = get_offers_for_movie(movie, country_code)
 
         grouped = defaultdict(list)
