@@ -51,12 +51,13 @@ def movie_detail(request, movie_slug):
     movie = get_object_or_404(Movie, slug=movie_slug)
     is_bookmarked = _is_bookmarked(request.user, "movie", movie)
 
-    country_code = None
-    country_name = None
-    ordered_offers = None
+    country_code = ""
+    country_name = ""
+    ordered_offers = []
     if request.user.is_authenticated:
-        country_code = request.user.profile.country.code
-        country_name = request.user.profile.country.name
+        country = request.user.profile.country
+        country_code = country.code
+        country_name = country.name
         offers = get_offers_for_movie(movie, country_code)
 
         grouped = defaultdict(list)
