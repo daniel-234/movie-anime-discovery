@@ -64,7 +64,7 @@
         <div id="anime" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
             {% for anime in anime_list %}
                 {% url 'media:anime_detail' anime_slug=anime.slug as detail_url %}
-                {% include "media/_card.html" with item=anime rank=forloop.counter detail_url=detail_url %}
+                {% include "media/_card.html" with item=anime rank=forloop.counter detail_url=detail_url content_type="anime" saved_ids=saved_anime_ids %}
             {% endfor %}
         </div>
     </section>
@@ -96,7 +96,7 @@
         <div id="manga" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
             {% for manga in manga_list %}
                 {% url 'media:manga_detail' manga_slug=manga.slug as detail_url %}
-                {% include "media/_card.html" with item=manga rank=forloop.counter detail_url=detail_url %}
+                {% include "media/_card.html" with item=manga rank=forloop.counter detail_url=detail_url content_type="manga" saved_ids=saved_manga_ids %}
             {% endfor %}
         </div>
     </section>

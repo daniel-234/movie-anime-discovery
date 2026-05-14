@@ -37,14 +37,17 @@ def _resolve(content_type: str) -> tuple[type[Model], type[Model], str]:
 
 
 def home(request):
-    # Evaluate the sliced queryset and pass a list of objects
-    # to `get_saved_ids`. Otherwise Django turns it into a subquery
-    # that match an unstable set.
+    # Evaluate the sliced querysets and pass lists of objects to
+    # `get_saved_ids`. A lazy sliced QuerySet would be embedded as a
+    # LIMIT subquery in the `__in` lookup, which can match an
+    # unstable set of rows.
     movie_list = list(Movie.objects.all()[:POSTERS_PER_ROW])
-    anime_list = Anime.objects.all()[:POSTERS_PER_ROW]
-    manga_list = Manga.objects.all()[:POSTERS_PER_ROW]
+    anime_list = list(Anime.objects.all()[:POSTERS_PER_ROW])
+    manga_list = list(Manga.objects.all()[:POSTERS_PER_ROW])
 
     _, saved_movie_model, movie_fk = _resolve("movie")
+    _, saved_anime_model, anime_fk = _resolve("anime")
+    _, saved_manga_model, manga_fk = _resolve("manga")
 
     context = {
         "movie_list": movie_list,
@@ -52,6 +55,12 @@ def home(request):
         "manga_list": manga_list,
         "saved_movie_ids": get_saved_ids(
             request.user, saved_movie_model, movie_fk, movie_list
+        ),
+        "saved_anime_ids": get_saved_ids(
+            request.user, saved_anime_model, anime_fk, anime_list
+        ),
+        "saved_manga_ids": get_saved_ids(
+            request.user, saved_manga_model, manga_fk, manga_list
         ),
         "grid_cols_class": f"grid-cols-{POSTERS_PER_ROW}",
     }

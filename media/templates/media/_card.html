@@ -5,10 +5,10 @@ Accepts:
   item         - the model instance (movie / anime / manga)
   rank         - integer position (forloop.counter)
   detail_url   - the resolved detail URL, passed in by the parent template
-
-Optional (movies only, for now):
-  content_type - "movie" — enables the year + bookmark row
-  saved_ids    - set of bookmarked item IDs for the current user
+  content_type - "movie" / "anime" / "manga" — enables the year +
+                 bookmark row
+  saved_ids    - set of the current user's bookmarked item IDs, used
+                 to render the star filled or empty
 
 Layout: the card is a fixed-height flex column. The cover has a fixed
 height; the <a> (cover + title) flexes to fill the remaining space, so
@@ -19,9 +19,9 @@ source images of varying dimensions fill the box without stretching
 
 When content_type is passed, the bottom row renders with the year
 (left) and, for logged-in users, a compact bookmark star (right).
-Anime/manga includes omit content_type, so that row — including their
-year — does not appear yet. Restore anime/manga year display when
-their bookmarking is built.
+All three content types pass content_type, so every card shows this
+row. The card reads `item.year` for the year — a real field on
+Anime/Manga, a property on Movie — so the template stays uniform.
 {% endcomment %}
 
 <div class="flex-none w-44 sm:w-48 snap-start flex flex-col h-[22rem] bg-cream-soft border border-line rounded-xl overflow-hidden hover:border-ink-3 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
@@ -68,11 +68,10 @@ their bookmarking is built.
     </a>
 
     {# Year + bookmark row — sits OUTSIDE the <a> (HTMX button can't be in an anchor). #}
-    {# Pinned to the card bottom by the flex-1 on the <a> above. Movies only, for now. #}
     {% if content_type %}
         <div class="px-3 pb-3 shrink-0 flex items-center justify-between gap-2">
             <span class="text-xs text-ink-3">
-                {% if item.release_date %}{{ item.release_date|date:"Y" }}{% endif %}
+                {% if item.year %}{{ item.year }}{% endif %}
             </span>
             {% if user.is_authenticated %}
                 {% if item.id in saved_ids %}
