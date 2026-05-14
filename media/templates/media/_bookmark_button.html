@@ -1,8 +1,8 @@
-<div id="bookmark-button-wrapper">
+<div id="bookmark-{{ content_type }}-{{ item.id }}">
   {% if user.is_authenticated %}
     <button
       hx-post="{% url 'media:toggle_bookmark' content_type=content_type slug=item.slug %}"
-      hx-target="#bookmark-button-wrapper"
+      hx-target="#bookmark-{{ content_type }}-{{ item.id }}"
       hx-swap="outerHTML"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
       type="button">

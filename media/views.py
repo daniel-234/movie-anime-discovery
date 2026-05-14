@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from media.models import StreamingOffer
-from media.services import get_offers_for_movie
+from media.services import get_offers_for_movie, get_saved_ids
 
 from .models import Anime, Manga, Movie, SavedAnime, SavedManga, SavedMovie
 
@@ -37,10 +37,22 @@ def _resolve(content_type: str) -> tuple[type[Model], type[Model], str]:
 
 
 def home(request):
+    # Evaluate the sliced queryset and pass a list of objects
+    # to `get_saved_ids`. Otherwise Django turns it into a subquery
+    # that match an unstable set.
+    movie_list = list(Movie.objects.all()[:POSTERS_PER_ROW])
+    anime_list = Anime.objects.all()[:POSTERS_PER_ROW]
+    manga_list = Manga.objects.all()[:POSTERS_PER_ROW]
+
+    _, saved_movie_model, movie_fk = _resolve("movie")
+
     context = {
-        "movie_list": Movie.objects.all()[:POSTERS_PER_ROW],
-        "anime_list": Anime.objects.all()[:POSTERS_PER_ROW],
-        "manga_list": Manga.objects.all()[:POSTERS_PER_ROW],
+        "movie_list": movie_list,
+        "anime_list": anime_list,
+        "manga_list": manga_list,
+        "saved_movie_ids": get_saved_ids(
+            request.user, saved_movie_model, movie_fk, movie_list
+        ),
         "grid_cols_class": f"grid-cols-{POSTERS_PER_ROW}",
     }
 

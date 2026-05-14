@@ -32,7 +32,7 @@
         <div id="movies" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
             {% for movie in movie_list %}
                 {% url 'media:movie_detail' movie_slug=movie.slug as detail_url %}
-                {% include "media/_card.html" with item=movie rank=forloop.counter detail_url=detail_url %}
+                {% include "media/_card.html" with item=movie rank=forloop.counter detail_url=detail_url content_type="movie" saved_ids=saved_movie_ids %}
             {% endfor %}
         </div>
     </section>

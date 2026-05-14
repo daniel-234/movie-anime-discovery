@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.db.models import QuerySet
+from django.db.models import Model, QuerySet
 from django.utils import timezone
 
 from media.models import Movie, SavedMovie, Service, StreamingOffer
@@ -79,3 +79,17 @@ def get_saved_movies(user) -> QuerySet[SavedMovie]:
     if not user.is_authenticated:
         return SavedMovie.objects.none()
     return SavedMovie.objects.filter(user=user).select_related("movie")
+
+
+def get_saved_ids(user, saved_model: type[Model], fk_name: str, items) -> set[int]:
+    """Return the IDs (from `items`) the user has bookmarked.
+
+    One query regardless of item count — avoids an .exists() per card.
+    """
+    if not user.is_authenticated:
+        return set()
+    return set(
+        saved_model.objects.filter(user=user, **{f"{fk_name}__in": items}).values_list(
+            f"{fk_name}_id", flat=True
+        )
+    )
