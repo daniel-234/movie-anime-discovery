@@ -3,13 +3,23 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 
+from media.services import get_saved_movies
+
 from .forms import ProfileEditForm, SignUpForm, SignUpProfileForm, UserEditForm
 
 
 @never_cache
 @login_required
 def dashboard(request):
-    return render(request, "account/dashboard.html", {"section": "dashboard"})
+    saved_movies = get_saved_movies(request.user)
+    return render(
+        request,
+        "account/dashboard.html",
+        {
+            "section": "dashboard",
+            "saved_movies": saved_movies,
+        },
+    )
 
 
 def signup(request):

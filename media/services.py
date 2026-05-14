@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.db.models import QuerySet
 from django.utils import timezone
 
-from media.models import Movie, Service, StreamingOffer
+from media.models import Movie, SavedMovie, Service, StreamingOffer
 from media.tmdb import get_watch_providers_for_movie
 
 CACHE_TTL = timedelta(days=7)
@@ -72,3 +72,10 @@ def get_offers_for_movie(movie: Movie, country: str) -> QuerySet[StreamingOffer]
     return StreamingOffer.objects.filter(movie=movie, country=country).select_related(
         "service"
     )
+
+
+def get_saved_movies(user) -> QuerySet[SavedMovie]:
+    """Return the user's bookmarked movies, newest first."""
+    if not user.is_authenticated:
+        return SavedMovie.objects.none()
+    return SavedMovie.objects.filter(user=user).select_related("movie")
