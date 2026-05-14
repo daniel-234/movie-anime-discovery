@@ -155,5 +155,6 @@ def toggle_bookmark(request: HttpRequest, content_type: str, slug: str) -> HttpR
             "item": item,
             "content_type": content_type,
             "is_bookmarked": created,
+            "compact": request.POST.get("compact") == "1",
         },
     )

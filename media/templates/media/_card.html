@@ -7,19 +7,28 @@ Accepts:
   detail_url   - the resolved detail URL, passed in by the parent template
 
 Optional (movies only, for now):
-  content_type - "movie" — enables the bookmark row
+  content_type - "movie" — enables the year + bookmark row
   saved_ids    - set of bookmarked item IDs for the current user
 
-When content_type and saved_ids are both passed, a bookmark button
-renders below the card. Anime/manga includes omit them, so the row
-simply doesn't appear.
+Layout: the card is a fixed-height flex column. The cover has a fixed
+height; the <a> (cover + title) flexes to fill the remaining space, so
+the year + bookmark row is pinned to the bottom on every card,
+regardless of how long the title is. Covers use object-cover, so
+source images of varying dimensions fill the box without stretching
+(minor edge cropping only).
+
+When content_type is passed, the bottom row renders with the year
+(left) and, for logged-in users, a compact bookmark star (right).
+Anime/manga includes omit content_type, so that row — including their
+year — does not appear yet. Restore anime/manga year display when
+their bookmarking is built.
 {% endcomment %}
 
-<div class="flex-none w-44 sm:w-48 snap-start bg-cream-soft border border-line rounded-xl overflow-hidden hover:border-ink-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+<div class="flex-none w-44 sm:w-48 snap-start flex flex-col h-[22rem] bg-cream-soft border border-line rounded-xl overflow-hidden hover:border-ink-3 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
 
-    <a href="{{ detail_url }}" class="group block">
-        {# Cover #}
-        <div class="relative aspect-[2/3] bg-line overflow-hidden">
+    <a href="{{ detail_url }}" class="group flex flex-col flex-1 min-h-0">
+        {# Cover — fixed height, never shrinks #}
+        <div class="relative h-60 shrink-0 bg-line overflow-hidden">
             {% if item.poster_path %}
                 <img src="{{ item.poster_url }}"
                      alt="{{ item.title }}"
@@ -50,35 +59,27 @@ simply doesn't appear.
             {% endif %}
         </div>
 
-        {# Body #}
-        <div class="p-3 flex flex-col gap-1.5">
+        {# Body — title only; sits in the flexible space, may wrap to 2 lines #}
+        <div class="p-3">
             <h3 class="text-sm font-semibold leading-snug text-ink line-clamp-2">
                 {{ item.title }}
             </h3>
-
-            {# Metadata row renders only if at least one supported field exists #}
-            {% if item.release_date or item.year or item.start_year %}
-                <div class="flex items-center gap-1.5 text-xs text-ink-3 mt-auto">
-                    {% if item.release_date %}
-                        <span>{{ item.release_date|date:"Y" }}</span>
-                    {% elif item.year %}
-                        <span>{{ item.year }}</span>
-                    {% elif item.start_year %}
-                        <span>{{ item.start_year }}</span>
-                    {% endif %}
-                </div>
-            {% endif %}
         </div>
     </a>
 
-    {# Bookmark row — only for cards given content_type + saved_ids (movies, for now). #}
-    {# Sits OUTSIDE the <a> so the HTMX <button> isn't nested in a link. #}
-    {% if content_type and user.is_authenticated %}
-        <div class="px-3 pb-3">
-            {% if item.id in saved_ids %}
-                {% include "media/_bookmark_button.html" with item=item content_type=content_type is_bookmarked=True %}
-            {% else %}
-                {% include "media/_bookmark_button.html" with item=item content_type=content_type is_bookmarked=False %}
+    {# Year + bookmark row — sits OUTSIDE the <a> (HTMX button can't be in an anchor). #}
+    {# Pinned to the card bottom by the flex-1 on the <a> above. Movies only, for now. #}
+    {% if content_type %}
+        <div class="px-3 pb-3 shrink-0 flex items-center justify-between gap-2">
+            <span class="text-xs text-ink-3">
+                {% if item.release_date %}{{ item.release_date|date:"Y" }}{% endif %}
+            </span>
+            {% if user.is_authenticated %}
+                {% if item.id in saved_ids %}
+                    {% include "media/_bookmark_button.html" with item=item content_type=content_type is_bookmarked=True compact=True %}
+                {% else %}
+                    {% include "media/_bookmark_button.html" with item=item content_type=content_type is_bookmarked=False compact=True %}
+                {% endif %}
             {% endif %}
         </div>
     {% endif %}
