@@ -108,14 +108,6 @@ def manga_detail(request, manga_slug):
     )
 
 
-def get_saved_movies(user):
-    """Return the user's bookmarked movies, newest first."""
-    if not user.is_authenticated:
-        return SavedMovie.objects.none()
-    _, saved_model, _ = _resolve("movie")
-    return saved_model.objects.filter(user=user).select_related("movie")
-
-
 def _is_bookmarked(user, content_type: str, item) -> bool:
     """Return True if the user has bookmarked this item."""
     if not user.is_authenticated:
