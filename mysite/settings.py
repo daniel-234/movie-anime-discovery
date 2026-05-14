@@ -15,6 +15,7 @@ from pathlib import Path
 
 import dj_database_url
 from decouple import Csv, config
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,8 +34,10 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost", cast=Csv())
 
-# Load the .env API variales
+# Load the .env API variables
 TMDB_TOKEN = config("TMDB_TOKEN")
+if not TMDB_TOKEN:
+    raise ImproperlyConfigured("TMDB_TOKEN environment variable not set or empty.")
 
 # Application definition
 

@@ -2,12 +2,8 @@ from typing import TypedDict
 
 import httpx
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 
 TMDB_TOKEN = settings.TMDB_TOKEN
-
-if not TMDB_TOKEN:
-    raise ImproperlyConfigured("TMDB_TOKEN environment variable not set.")
 
 TMDB_URL = "https://api.themoviedb.org/3"
 
