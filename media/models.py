@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.templatetags.static import static
 from django.utils.text import slugify
 
 
@@ -23,8 +24,8 @@ class Movie(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, blank=True, null=True)
     overview = models.CharField(max_length=250)
-    poster_path = models.URLField(blank=True, null=True)
-    backdrop_path = models.URLField(blank=True, null=True)
+    poster_path = models.CharField(max_length=200, blank=True)
+    backdrop_path = models.CharField(max_length=200, blank=True)
     media_type = models.CharField(max_length=20)
     # TODO Check if there's any specification in the API docs about this value length
     original_language = models.CharField(max_length=3)
@@ -37,6 +38,16 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
+    def poster_url(self, size="w342"):
+        if not self.poster_path:
+            return static("media/placeholder-poster.png")
+        return f"{settings.TMDB_IMAGE_BASE}/{size}{self.poster_path}"
+
+    def backdrop_url(self, size="w780"):
+        if not self.backdrop_path:
+            return ""
+        return f"{settings.TMDB_IMAGE_BASE}/{size}{self.backdrop_path}"
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -206,6 +217,11 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+
+    def logo_url(self, size="w45"):
+        if not self.logo_path:
+            return ""
+        return f"{settings.TMDB_IMAGE_BASE}/{size}{self.logo_path}"
 
 
 class StreamingOffer(models.Model):

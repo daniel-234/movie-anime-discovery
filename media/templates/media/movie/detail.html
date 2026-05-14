@@ -5,7 +5,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8">
         <img class="w-64 object-cover rounded-lg border border-line"
-             src="https://image.tmdb.org/t/p/w342{{ movie.poster_path }}"
+             src="{{ movie.poster_url }}"
              alt="{{ movie.title }}">
 
         <div class="grid gap-3 content-start">
@@ -31,9 +31,11 @@
                         <div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2">
                             {% for offer in offers %}
                                 <div class="grid grid-cols-[auto_1fr] items-center gap-2 px-3 py-1.5 rounded-md bg-cream border border-line">
-                                    <img src="https://image.tmdb.org/t/p/w45{{ offer.service.logo_path }}"
-                                         alt=""
-                                         class="h-6 w-6 rounded-sm">
+                                    {% if offer.service.logo_url %}
+                                        <img src="{{ offer.service.logo_url }}"
+                                            alt="{{ offer.service.name }} logo"
+                                            class="h-6 w-6 rounded-sm">
+                                    {% endif %}
                                     <span class="text-sm text-ink truncate">{{ offer.service.name }}</span>
                                 </div>
                             {% endfor %}

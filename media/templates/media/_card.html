@@ -21,7 +21,7 @@ Cover image source differs between models:
     {# Cover #}
     <div class="relative aspect-[2/3] bg-line overflow-hidden">
         {% if item.poster_path %}
-            <img src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}"
+            <img src="{{ item.poster_url }}"
                  alt="{{ item.title }}"
                  loading="lazy"
                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
