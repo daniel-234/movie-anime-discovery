@@ -1,7 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.signals import user_logged_in
-from django.dispatch import receiver
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 
@@ -10,9 +8,9 @@ from media.services import get_saved_anime, get_saved_manga, get_saved_movies
 from .forms import ProfileEditForm, SignUpForm, SignUpProfileForm, UserEditForm
 
 
-@receiver(user_logged_in)
-def welcome_on_login(sender, user, request, **kwargs):
-    messages.success(request, f"Welcome back, {user.first_name or user.username}.")
+def welcome_on_login(sender, request, user, **kwargs):
+    if hasattr(request, "_messages"):
+        messages.success(request, f"Welcome back, {user.first_name or user.username}.")
 
 
 @never_cache
