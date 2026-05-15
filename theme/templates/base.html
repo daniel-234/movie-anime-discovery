@@ -31,13 +31,24 @@
                 Discover
             </a>
 
+            {# Primary nav — only shown to authenticated users #}
+            {% if request.user.is_authenticated %}
+                <nav class="flex items-center gap-6">
+                    <a href="{% url 'account:dashboard' %}"
+                       class="text-sm font-medium px-3 py-1 rounded-full transition-colors
+                              {% if request.resolver_match.url_name == 'dashboard' %}bg-forest text-cream{% else %}text-ink-2 hover:text-ink hover:bg-cream-soft{% endif %}">
+                        Bookmarks
+                    </a>
+                </nav>
+            {% endif %}
+
             <div class="flex-1"></div>
 
             {# User state — same auth logic as before, restyled #}
             <div class="flex items-center gap-3">
                 {% if request.user.is_authenticated %}
-                    <a href="{% url 'account:dashboard' %}"
-                    class="group flex items-center gap-2.5 pl-3 pr-1 py-1 rounded-full border border-line hover:bg-cream-soft hover:border-ink-2 transition-colors">
+                    <a href="{% url 'account:edit_profile' %}"
+                       class="group flex items-center gap-2.5 pl-3 pr-1 py-1 rounded-full border border-line hover:bg-cream-soft hover:border-ink-2 transition-colors">
                         <span class="text-sm text-ink-2 group-hover:text-ink hidden sm:inline transition-colors">
                             {{ request.user.first_name|default:request.user.username }}
                         </span>
