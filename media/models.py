@@ -166,6 +166,7 @@ class SavedMovie(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        # Enforces the fact that you can't have two SavedMovie rows for the same user+movie pair.
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "movie"], name="unique_user_movie_save"
