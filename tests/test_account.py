@@ -41,6 +41,7 @@ class SignupViewTest(TestCase):
             "username": "newUser",
             "password1": "Str0ngPass!99",
             "password2": "Str0ngPass!99",
+            "country": "IT",
         }
 
     def test_get_method_to_signup(self):
@@ -95,6 +96,7 @@ class ProfileEditViewTest(TestCase):
             "first_name": "Mario",
             "email": "new@example.com",
             "bio": "I am Super!",
+            "country": "JP",
         }
 
     def test_anonymous_client_gets_redirected_to_login_page(self):
@@ -148,6 +150,7 @@ class ProfileEditViewTest(TestCase):
             "first_name": "Mario",
             "email": "not-an-email",
             "bio": "I am Super in video games!",
+            "country": "ES",
         }
         self.assertEqual(self.user.email, "")
         response = self.client.post(reverse("account:edit_profile"), not_valid_data)
@@ -174,7 +177,7 @@ class LoginLogoutRedirectTest(TestCase):
             reverse("account:logout"),
             {"username": "loginuser", "password": "pass1234!"},
         )
-        self.assertRedirects(response, reverse("account:login"))
+        self.assertRedirects(response, reverse("media:home"))
 
     def test_posting_wrong_credentials_stays_in_login(self):
         response = self.client.post(
