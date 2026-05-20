@@ -74,10 +74,10 @@ RUN useradd --create-home --shell /bin/bash django \
 USER django
 
 # --- Runtime ---
-EXPOSE 8000
-
-CMD ["gunicorn", "mysite.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
+EXPOSE 8080
+  
+  CMD ["gunicorn", "mysite.wsgi:application", \
+       "--bind", "0.0.0.0:8080", \
      "--workers", "2", \
      "--access-logfile", "-", \
      "--error-logfile", "-"]
