@@ -1,9 +1,16 @@
 from datetime import timedelta
 
-from django.db.models import QuerySet
+from django.db.models import Model, QuerySet
 from django.utils import timezone
 
-from media.models import Movie, Service, StreamingOffer
+from media.models import (
+    Movie,
+    SavedAnime,
+    SavedManga,
+    SavedMovie,
+    Service,
+    StreamingOffer,
+)
 from media.tmdb import get_watch_providers_for_movie
 
 CACHE_TTL = timedelta(days=7)
@@ -71,4 +78,39 @@ def get_offers_for_movie(movie: Movie, country: str) -> QuerySet[StreamingOffer]
     StreamingOffer.objects.bulk_create(offers_to_create)
     return StreamingOffer.objects.filter(movie=movie, country=country).select_related(
         "service"
+    )
+
+
+def get_saved_movies(user) -> QuerySet[SavedMovie]:
+    """Return the user's bookmarked movies, newest first."""
+    if not user.is_authenticated:
+        return SavedMovie.objects.none()
+    return SavedMovie.objects.filter(user=user).select_related("movie")
+
+
+def get_saved_anime(user) -> QuerySet[SavedAnime]:
+    """Return the user's bookmarked anime, newest first."""
+    if not user.is_authenticated:
+        return SavedAnime.objects.none()
+    return SavedAnime.objects.filter(user=user).select_related("anime")
+
+
+def get_saved_manga(user) -> QuerySet[SavedManga]:
+    """Return the user's bookmarked manga, newest first."""
+    if not user.is_authenticated:
+        return SavedManga.objects.none()
+    return SavedManga.objects.filter(user=user).select_related("manga")
+
+
+def get_saved_ids(user, saved_model: type[Model], fk_name: str, items) -> set[int]:
+    """Return the IDs (from `items`) the user has bookmarked.
+
+    One query regardless of item count — avoids an .exists() per card.
+    """
+    if not user.is_authenticated:
+        return set()
+    return set(
+        saved_model.objects.filter(user=user, **{f"{fk_name}__in": items}).values_list(
+            f"{fk_name}_id", flat=True
+        )
     )

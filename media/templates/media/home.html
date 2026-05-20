@@ -3,100 +3,94 @@
 {% block title %}Home — Discover{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-6 py-10 space-y-14">
+<div class="max-w-7xl mx-auto px-6 py-6 space-y-8">
 
     {# Trending movies #}
     <section>
-        <div class="flex items-end justify-between gap-6 mb-6">
-            <div>
-                <h2 class="font-serif text-3xl text-ink leading-tight">Trending movies</h2>
-                <p class="text-sm text-ink-3 mt-1">Popular this week</p>
+        <div class="flex items-baseline justify-between gap-4 mb-3">
+            <div class="flex items-baseline gap-3 min-w-0">
+                <h2 class="font-serif italic text-2xl text-ink leading-none">Trending movies</h2>
+                <p class="text-xs text-ink-3 hidden sm:block">Popular this week</p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="#" class="text-sm font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="#" class="text-xs font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
                     See all <span aria-hidden="true">→</span>
                 </a>
-                <div class="flex gap-2">
-                    <button type="button" data-scroll="movies" data-dir="-1" aria-label="Scroll left"
-                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                    </button>
-                    <button type="button" data-scroll="movies" data-dir="1" aria-label="Scroll right"
-                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
-                </div>
+                <button type="button" data-scroll="movies" data-dir="-1" aria-label="Scroll left"
+                        class="w-7 h-7 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button type="button" data-scroll="movies" data-dir="1" aria-label="Scroll right"
+                        class="w-7 h-7 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
         </div>
 
-        <div id="movies" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
+        <div id="movies" class="flex gap-3 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
             {% for movie in movie_list %}
                 {% url 'media:movie_detail' movie_slug=movie.slug as detail_url %}
-                {% include "media/_card.html" with item=movie rank=forloop.counter detail_url=detail_url %}
+                {% include "media/_card.html" with item=movie rank=forloop.counter detail_url=detail_url content_type="movie" saved_ids=saved_movie_ids %}
             {% endfor %}
         </div>
     </section>
 
     {# Trending anime #}
     <section>
-        <div class="flex items-end justify-between gap-6 mb-6">
-            <div>
-                <h2 class="font-serif text-3xl text-ink leading-tight">Trending anime</h2>
-                <p class="text-sm text-ink-3 mt-1">Top series airing now</p>
+        <div class="flex items-baseline justify-between gap-4 mb-3">
+            <div class="flex items-baseline gap-3 min-w-0">
+                <h2 class="font-serif italic text-2xl text-ink leading-none">Trending anime</h2>
+                <p class="text-xs text-ink-3 hidden sm:block">Top series airing now</p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="#" class="text-sm font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="#" class="text-xs font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
                     See all <span aria-hidden="true">→</span>
                 </a>
-                <div class="flex gap-2">
-                    <button type="button" data-scroll="anime" data-dir="-1" aria-label="Scroll left"
-                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                    </button>
-                    <button type="button" data-scroll="anime" data-dir="1" aria-label="Scroll right"
-                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
-                </div>
+                <button type="button" data-scroll="anime" data-dir="-1" aria-label="Scroll left"
+                        class="w-7 h-7 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button type="button" data-scroll="anime" data-dir="1" aria-label="Scroll right"
+                        class="w-7 h-7 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
         </div>
 
-        <div id="anime" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
+        <div id="anime" class="flex gap-3 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
             {% for anime in anime_list %}
                 {% url 'media:anime_detail' anime_slug=anime.slug as detail_url %}
-                {% include "media/_card.html" with item=anime rank=forloop.counter detail_url=detail_url %}
+                {% include "media/_card.html" with item=anime rank=forloop.counter detail_url=detail_url content_type="anime" saved_ids=saved_anime_ids %}
             {% endfor %}
         </div>
     </section>
 
     {# Trending manga #}
     <section>
-        <div class="flex items-end justify-between gap-6 mb-6">
-            <div>
-                <h2 class="font-serif text-3xl text-ink leading-tight">Trending manga</h2>
-                <p class="text-sm text-ink-3 mt-1">Most read this month</p>
+        <div class="flex items-baseline justify-between gap-4 mb-3">
+            <div class="flex items-baseline gap-3 min-w-0">
+                <h2 class="font-serif italic text-2xl text-ink leading-none">Trending manga</h2>
+                <p class="text-xs text-ink-3 hidden sm:block">Most read this month</p>
             </div>
-            <div class="flex items-center gap-3">
-                <a href="#" class="text-sm font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
+            <div class="flex items-center gap-2 shrink-0">
+                <a href="#" class="text-xs font-medium text-ink-2 hover:text-ink transition-colors hidden sm:inline-flex items-center gap-1 hover:gap-1.5">
                     See all <span aria-hidden="true">→</span>
                 </a>
-                <div class="flex gap-2">
-                    <button type="button" data-scroll="manga" data-dir="-1" aria-label="Scroll left"
-                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                    </button>
-                    <button type="button" data-scroll="manga" data-dir="1" aria-label="Scroll right"
-                            class="w-9 h-9 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-                    </button>
-                </div>
+                <button type="button" data-scroll="manga" data-dir="-1" aria-label="Scroll left"
+                        class="w-7 h-7 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button type="button" data-scroll="manga" data-dir="1" aria-label="Scroll right"
+                        class="w-7 h-7 rounded-full border border-line bg-cream-soft text-ink-2 hover:border-ink-2 hover:text-ink transition-colors grid place-items-center">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
         </div>
 
-        <div id="manga" class="flex gap-4 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
+        <div id="manga" class="flex gap-3 overflow-x-auto scrollbar-none -mx-6 px-6 pb-2 scroll-smooth snap-x">
             {% for manga in manga_list %}
                 {% url 'media:manga_detail' manga_slug=manga.slug as detail_url %}
-                {% include "media/_card.html" with item=manga rank=forloop.counter detail_url=detail_url %}
+                {% include "media/_card.html" with item=manga rank=forloop.counter detail_url=detail_url content_type="manga" saved_ids=saved_manga_ids %}
             {% endfor %}
         </div>
     </section>

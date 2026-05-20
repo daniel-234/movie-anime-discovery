@@ -2,12 +2,8 @@ from typing import TypedDict
 
 import httpx
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 
 TMDB_TOKEN = settings.TMDB_TOKEN
-
-if not TMDB_TOKEN:
-    raise ImproperlyConfigured("TMDB_TOKEN environment variable not set.")
 
 TMDB_URL = "https://api.themoviedb.org/3"
 
@@ -47,47 +43,33 @@ class CountryOffers(TypedDict, total=False):
     free: list[ServiceProvider]
 
 
-def get_movie_list_from_api(endpoint: str) -> list[Movie] | None:
+def _get_from_api(endpoint: str, default):
+    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
+        response = client.get(endpoint)
+        response.raise_for_status()
+        return response.json().get("results", default)
+
+
+def get_movie_list_from_api(endpoint: str) -> list[Movie]:
     """
     Retrieve movie information from a TMDB API endpoint
     """
-    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
-        try:
-            response = client.get(endpoint)
-            response.raise_for_status()
-            return response.json().get("results", [])
-        except (httpx.HTTPStatusError, httpx.RequestError) as e:
-            print(f"Failed to fetch data for {endpoint}: {e}")
-            return None
+    return _get_from_api(endpoint, [])
 
 
-def get_services_list_from_api(endpoint: str) -> list[ServiceProvider] | None:
+def get_services_list_from_api(endpoint: str) -> list[ServiceProvider]:
     """
     Retrieve the list of streaming services from a TMDB API endpoint.
     """
-    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
-        try:
-            response = client.get(endpoint)
-            response.raise_for_status()
-            return response.json().get("results", [])
-        except (httpx.HTTPStatusError, httpx.RequestError) as e:
-            print(f"Failed to fetch data for {endpoint}: {e}")
-            return None
+    return _get_from_api(endpoint, [])
 
 
 def get_watch_providers_for_movie(
     movie_id: int,
-) -> dict[str, CountryOffers] | None:
+) -> dict[str, CountryOffers]:
     """
     Retrieve watch providers (streaming availability) for a single movie
     across all countries TMDB tracks.
     """
     endpoint = f"/movie/{movie_id}/watch/providers"
-    with httpx.Client(base_url=TMDB_URL, headers=HEADERS) as client:
-        try:
-            response = client.get(endpoint)
-            response.raise_for_status()
-            return response.json().get("results", {})
-        except (httpx.HTTPStatusError, httpx.RequestError) as e:
-            print(f"Failed to fetch watch providers for movie {movie_id}: {e}")
-            return None
+    return _get_from_api(endpoint, {})

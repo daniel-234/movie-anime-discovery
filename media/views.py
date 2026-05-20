@@ -6,9 +6,8 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
-from account.models import Profile
 from media.models import StreamingOffer
-from media.services import get_offers_for_movie
+from media.services import get_offers_for_movie, get_saved_ids
 
 from .models import Anime, Manga, Movie, SavedAnime, SavedManga, SavedMovie
 
@@ -38,10 +37,31 @@ def _resolve(content_type: str) -> tuple[type[Model], type[Model], str]:
 
 
 def home(request):
+    # Evaluate the sliced querysets and pass lists of objects to
+    # `get_saved_ids`. A lazy sliced QuerySet would be embedded as a
+    # LIMIT subquery in the `__in` lookup, which can match an
+    # unstable set of rows.
+    movie_list = list(Movie.objects.all()[:POSTERS_PER_ROW])
+    anime_list = list(Anime.objects.all()[:POSTERS_PER_ROW])
+    manga_list = list(Manga.objects.all()[:POSTERS_PER_ROW])
+
+    _, saved_movie_model, movie_fk = _resolve("movie")
+    _, saved_anime_model, anime_fk = _resolve("anime")
+    _, saved_manga_model, manga_fk = _resolve("manga")
+
     context = {
-        "movie_list": Movie.objects.all()[:POSTERS_PER_ROW],
-        "anime_list": Anime.objects.all()[:POSTERS_PER_ROW],
-        "manga_list": Manga.objects.all()[:POSTERS_PER_ROW],
+        "movie_list": movie_list,
+        "anime_list": anime_list,
+        "manga_list": manga_list,
+        "saved_movie_ids": get_saved_ids(
+            request.user, saved_movie_model, movie_fk, movie_list
+        ),
+        "saved_anime_ids": get_saved_ids(
+            request.user, saved_anime_model, anime_fk, anime_list
+        ),
+        "saved_manga_ids": get_saved_ids(
+            request.user, saved_manga_model, manga_fk, manga_list
+        ),
         "grid_cols_class": f"grid-cols-{POSTERS_PER_ROW}",
     }
 
@@ -52,13 +72,13 @@ def movie_detail(request, movie_slug):
     movie = get_object_or_404(Movie, slug=movie_slug)
     is_bookmarked = _is_bookmarked(request.user, "movie", movie)
 
-    country_code = None
-    country_name = None
-    ordered_offers = None
+    country_code = ""
+    country_name = ""
+    ordered_offers = []
     if request.user.is_authenticated:
-        profile = Profile.objects.get(user=request.user)
-        country_code = profile.country.code
-        country_name = profile.country.name
+        country = request.user.profile.country
+        country_code = country.code
+        country_name = country.name
         offers = get_offers_for_movie(movie, country_code)
 
         grouped = defaultdict(list)
@@ -144,5 +164,6 @@ def toggle_bookmark(request: HttpRequest, content_type: str, slug: str) -> HttpR
             "item": item,
             "content_type": content_type,
             "is_bookmarked": created,
+            "compact": request.POST.get("compact") == "1",
         },
     )

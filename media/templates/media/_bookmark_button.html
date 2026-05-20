@@ -1,15 +1,17 @@
-<div id="bookmark-button-wrapper">
+<div id="bookmark-{{ content_type }}-{{ item.id }}">
   {% if user.is_authenticated %}
     <button
       hx-post="{% url 'media:toggle_bookmark' content_type=content_type slug=item.slug %}"
-      hx-target="#bookmark-button-wrapper"
+      hx-target="#bookmark-{{ content_type }}-{{ item.id }}"
       hx-swap="outerHTML"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-      type="button">
-      {% if is_bookmarked %}
-        ★ Bookmarked
+      {% if compact %}hx-vals='{"compact": "1"}'{% endif %}
+      type="button"
+      {% if compact %}aria-label="{% if is_bookmarked %}Remove bookmark{% else %}Add bookmark{% endif %}"{% endif %}>
+      {% if compact %}
+        {% if is_bookmarked %}★{% else %}☆{% endif %}
       {% else %}
-        ☆ Bookmark
+        {% if is_bookmarked %}★ Bookmarked{% else %}☆ Bookmark{% endif %}
       {% endif %}
     </button>
   {% endif %}

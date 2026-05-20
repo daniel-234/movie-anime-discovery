@@ -3,13 +3,29 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import never_cache
 
+from media.services import get_saved_anime, get_saved_manga, get_saved_movies
+
 from .forms import ProfileEditForm, SignUpForm, SignUpProfileForm, UserEditForm
+
+
+def welcome_on_login(sender, request, user, **kwargs):
+    if hasattr(request, "_messages"):
+        messages.success(request, f"Welcome back, {user.first_name or user.username}.")
 
 
 @never_cache
 @login_required
 def dashboard(request):
-    return render(request, "account/dashboard.html", {"section": "dashboard"})
+    return render(
+        request,
+        "account/dashboard.html",
+        {
+            "section": "dashboard",
+            "saved_movies": get_saved_movies(request.user),
+            "saved_anime": get_saved_anime(request.user),
+            "saved_manga": get_saved_manga(request.user),
+        },
+    )
 
 
 def signup(request):

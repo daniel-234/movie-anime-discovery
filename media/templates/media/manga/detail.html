@@ -1,10 +1,55 @@
 {% extends "base.html" %}
 {% block title %}{{ manga.title }}{% endblock %}
 {% block content %}
-    <div>
-        <h1>{{ manga.title }}</h1>
-        <img class="w-64 object-cover rounded-lg" src="{{ manga.cover_image }}" alt="{{ manga.title }}">
-        {{ manga.country_of_origin }}
-        {% include "media/_bookmark_button.html" with item=manga content_type=content_type is_bookmarked=is_bookmarked %}
-    </div>    
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+    <div class="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-8">
+        <img class="w-64 object-cover rounded-lg border border-line"
+             src="{{ manga.cover_image }}"
+             alt="{{ manga.title }}">
+
+        <div class="grid gap-3 content-start">
+            <div class="grid gap-1">
+                <h1 class="text-3xl font-bold text-ink">{{ manga.title }}</h1>
+                {% if manga.title_romaji and manga.title_romaji != manga.title %}
+                    <p class="text-sm text-ink-2">{{ manga.title_romaji }}</p>
+                {% endif %}
+                {% if manga.title_native %}
+                    <p class="text-sm text-ink-3">{{ manga.title_native }}</p>
+                {% endif %}
+            </div>
+
+            {# Supporting facts — chips, same pattern as the movie page's offer rows #}
+            <div class="flex flex-wrap gap-2">
+                {% if manga.year %}
+                    <span class="px-2.5 py-1 rounded-md bg-cream border border-line text-sm text-ink">{{ manga.year }}</span>
+                {% endif %}
+                {% if manga.format %}
+                    <span class="px-2.5 py-1 rounded-md bg-cream border border-line text-sm text-ink">{{ manga.format }}</span>
+                {% endif %}
+                {% if manga.status %}
+                    <span class="px-2.5 py-1 rounded-md bg-cream border border-line text-sm text-ink">{{ manga.status }}</span>
+                {% endif %}
+                {% if manga.chapters %}
+                    <span class="px-2.5 py-1 rounded-md bg-cream border border-line text-sm text-ink">{{ manga.chapters }} chapters</span>
+                {% endif %}
+                {% if manga.volumes %}
+                    <span class="px-2.5 py-1 rounded-md bg-cream border border-line text-sm text-ink">{{ manga.volumes }} volumes</span>
+                {% endif %}
+                {% if manga.score %}
+                    <span class="px-2.5 py-1 rounded-md bg-cream border border-line text-sm text-ink">★ {{ manga.score }}</span>
+                {% endif %}
+            </div>
+
+            {% if manga.description %}
+                <div class="text-ink">{{ manga.description|safe }}</div>
+            {% endif %}
+
+            <div>
+                {% include "media/_bookmark_button.html" with item=manga content_type=content_type is_bookmarked=is_bookmarked %}
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

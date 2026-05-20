@@ -3,31 +3,97 @@
 {% block title %}Dashboard — Discover{% endblock %}
 
 {% block content %}
-<div class="min-h-screen grid place-items-center bg-cream px-4">
-  <div class="w-full max-w-md bg-cream-soft p-8 rounded-lg border border-line">
-    <h1 class="text-2xl font-bold text-ink mb-2">Dashboard</h1>
-    <p class="text-sm text-ink-2 mb-6">Welcome back, {{ user.first_name|default:user.username }}.</p>
+<div class="min-h-screen bg-cream px-6 py-10">
+    <div class="max-w-5xl mx-auto grid gap-8">
 
-    <div class="mb-6">
-      <a href="{% url 'account:edit_profile' %}"
-        class="group inline-grid grid-cols-[auto_auto_auto] items-center gap-2 px-3 py-1.5 rounded-full
-                bg-cream border border-line text-sm text-ink
-                hover:bg-cream-soft hover:border-ink-2 transition-colors">
-        <img src="{{ user.profile.country.flag }}"
-            alt=""
-            class="h-4 w-auto rounded-sm">
-        <span class="font-medium">{{ user.profile.country.name }}</span>
-        <span class="text-xs text-ink-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          Edit
-        </span>
-      </a>
-    </div>
+        <h1 class="text-2xl font-bold text-ink">Your bookmarks</h1>
 
-    <div class="grid gap-3">
-      <a href="{% url 'account:edit_profile' %}" class="w-full bg-forest hover:bg-forest-deep text-cream py-2 rounded transition-colors text-center">
-        Edit profile
-      </a>
+        {# ===== Bookmark shelves ===== #}
+        <section class="grid gap-6">
+
+            <div class="grid grid-cols-[6rem_1fr] gap-4 items-center">
+                <h2 class="text-sm font-semibold text-ink-2 uppercase tracking-wide">
+                    Movies
+                </h2>
+                {% if saved_movies %}
+                    <ul class="grid grid-flow-col auto-cols-[7rem] justify-start gap-4
+                               overflow-x-auto pb-2">
+                        {% for saved in saved_movies %}
+                            <li>
+                                <a href="{% url 'media:movie_detail' saved.movie.slug %}"
+                                   class="block group">
+                                    <img src="{{ saved.movie.poster_url }}"
+                                         alt=""
+                                         class="w-28 h-40 object-cover rounded border border-line
+                                                group-hover:border-ink-2 transition-colors">
+                                    <span class="block mt-1.5 text-xs text-ink font-medium truncate">
+                                        {{ saved.movie.title }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-sm text-ink-2">You haven't bookmarked any movies yet.</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-[6rem_1fr] gap-4 items-center">
+                <h2 class="text-sm font-semibold text-ink-2 uppercase tracking-wide">
+                    Anime
+                </h2>
+                {% if saved_anime %}
+                    <ul class="grid grid-flow-col auto-cols-[7rem] justify-start gap-4
+                               overflow-x-auto pb-2">
+                        {% for saved in saved_anime %}
+                            <li>
+                                <a href="{% url 'media:anime_detail' anime_slug=saved.anime.slug %}"
+                                   class="block group">
+                                    <img src="{{ saved.anime.cover_image }}"
+                                         alt=""
+                                         class="w-28 h-40 object-cover rounded border border-line
+                                                group-hover:border-ink-2 transition-colors">
+                                    <span class="block mt-1.5 text-xs text-ink font-medium truncate">
+                                        {{ saved.anime.title }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-sm text-ink-2">You haven't bookmarked any anime yet.</p>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-[6rem_1fr] gap-4 items-center">
+                <h2 class="text-sm font-semibold text-ink-2 uppercase tracking-wide">
+                    Manga
+                </h2>
+                {% if saved_manga %}
+                    <ul class="grid grid-flow-col auto-cols-[7rem] justify-start gap-4
+                               overflow-x-auto pb-2">
+                        {% for saved in saved_manga %}
+                            <li>
+                                <a href="{% url 'media:manga_detail' manga_slug=saved.manga.slug %}"
+                                   class="block group">
+                                    <img src="{{ saved.manga.cover_image }}"
+                                         alt=""
+                                         class="w-28 h-40 object-cover rounded border border-line
+                                                group-hover:border-ink-2 transition-colors">
+                                    <span class="block mt-1.5 text-xs text-ink font-medium truncate">
+                                        {{ saved.manga.title }}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-sm text-ink-2">You haven't bookmarked any manga yet.</p>
+                {% endif %}
+            </div>
+
+        </section>
+
     </div>
-  </div>
 </div>
 {% endblock %}
