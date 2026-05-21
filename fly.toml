@@ -1,23 +1,19 @@
-# fly.toml app configuration file generated for movie-anime-discovery-platform on 2026-05-20T20:00:40+02:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'movie-anime-discovery-platform'
 primary_region = 'fra'
 console_command = 'python manage.py shell'
 
 [build]
 
-[deploy]
-  release_command = 'python manage.py migrate --noinput'
+[[mounts]]
+  source = 'app_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = false
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [[vm]]
