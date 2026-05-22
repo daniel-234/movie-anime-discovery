@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         ca-certificates \
         build-essential \
-        libpq-dev \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean \
@@ -70,14 +69,11 @@ ENV SECRET_KEY="" \
 
 # --- Non-root user for security ---
 RUN useradd --create-home --shell /bin/bash django \
-    && chown -R django:django /app
+    && mkdir -p /data \
+    && chown -R django:django /app /data
 USER django
 
 # --- Runtime ---
-EXPOSE 8000
-
-CMD ["gunicorn", "mysite.wsgi:application", \
-     "--bind", "0.0.0.0:8000", \
-     "--workers", "2", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-"]
+EXPOSE 8080
+  
+CMD ["sh", "-c", "python manage.py migrate --noinput && exec gunicorn mysite.wsgi:application --bind 0.0.0.0:8080 --workers 2 --access-logfile - --error-logfile -"]

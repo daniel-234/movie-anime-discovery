@@ -15,6 +15,8 @@ uv sync
 You need to create some environemnt variables as defined in ```.env-template```.
 Create a ```.env``` file in the root of your project and provide all the values required in the template file. 
 
+For local development, set `DATABASE_URL=sqlite:///db.sqlite3` — the database file will be created in the project root the first time you run migrations.
+
 ### Requirements
 
 This project is built with the Django framework and it uses the ```django-tailwind``` package to apply Tailwind CSS for styling. As some dependencies are needed to make it work and they require Node.js to work in development mode, you need to install them in the project local environment:
@@ -55,3 +57,40 @@ Run the command:
 make tailwind
 ``` 
 and then navigate to http://127.0.0.1:8000/ to see the app running. 
+
+## Testing the production build locally
+
+The `prod-test` Docker Compose profile builds and runs the same image that gets deployed to Fly, against a Docker volume that mirrors the Fly volume mount. Useful for catching Docker- or build-level issues before deploying.
+
+```
+docker compose --profile prod-test build
+docker compose --profile prod-test up
+```
+
+By default the container uses `DATABASE_URL=sqlite:////data/app.db` (the production path).
+
+If your `.env` defines a different `DATABASE_URL` (e.g. `sqlite:///db.sqlite3` for `runserver`), Docker Compose will substitute that instead. To use the production default while keeping your `.env` intact for `runserver`, override at the command line:
+
+```
+DATABASE_URL= docker compose --profile prod-test up
+```
+
+## Deployment
+
+The app is deployed on [Fly.io](https://fly.io/) using SQLite on a persistent volume. Migrations run automatically on container startup via the Dockerfile `CMD`.
+
+To deploy changes:
+```
+fly deploy
+```
+
+To inspect or interact with the production database:
+```
+fly ssh console -C "python manage.py shell"
+```
+
+To run management commands in production (e.g. data refresh):
+```
+fly ssh console -C "python manage.py api_caching"
+fly ssh console -C "python manage.py sync_services"
+```
